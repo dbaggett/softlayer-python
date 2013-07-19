@@ -1,0 +1,564 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SoftLayer.messaging &mdash; SoftLayer API Python Client 2.3.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="SoftLayer API Python Client 2.3.0 documentation" href="../../index.html" />
+    <link rel="up" title="Managers" href="../managers.html" />
+    <link rel="next" title="SoftLayer.metadata" href="metadata.html" />
+    <link rel="prev" title="SoftLayer.hardware" href="hardware.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="metadata.html" title="SoftLayer.metadata"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="hardware.html" title="SoftLayer.hardware"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">SoftLayer API Python Client 2.3.0 documentation</a> &raquo;</li>
+          <li><a href="../managers.html" accesskey="U">Managers</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-SoftLayer.managers.messaging">
+<span id="softlayer-messaging"></span><span id="messaging"></span><h1>SoftLayer.messaging<a class="headerlink" href="#module-SoftLayer.managers.messaging" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="SoftLayer.managers.messaging.MessagingConnection">
+<em class="property">class </em><tt class="descclassname">SoftLayer.managers.messaging.</tt><tt class="descname">MessagingConnection</tt><big>(</big><em>id</em>, <em>endpoint=None</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Message Queue Service Connection</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> &#8211; Message Queue Account id</li>
+<li><strong>endpoint</strong> &#8211; Endpoint URL</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.authenticate">
+<tt class="descname">authenticate</tt><big>(</big><em>username</em>, <em>api_key</em>, <em>auth_token=None</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.authenticate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.authenticate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make request. Generally not called directly</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>username</strong> &#8211; SoftLayer username</li>
+<li><strong>api_key</strong> &#8211; SoftLayer API Key</li>
+<li><strong>auth_token</strong> &#8211; (optional) Starting auth token</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.create_queue">
+<tt class="descname">create_queue</tt><big>(</big><em>queue_name</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.create_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.create_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Queue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>queue_name</strong> &#8211; Queue Name</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) &#8211; queue options</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.create_subscription">
+<tt class="descname">create_subscription</tt><big>(</big><em>topic_name</em>, <em>type</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.create_subscription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.create_subscription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Subscription</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>topic_name</strong> &#8211; Topic Name</li>
+<li><strong>type</strong> &#8211; type (&#8216;queue&#8217; or &#8216;http&#8217;)</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) &#8211; Subscription options</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.create_topic">
+<tt class="descname">create_topic</tt><big>(</big><em>topic_name</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.create_topic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.create_topic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Topic</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>topic_name</strong> &#8211; Topic Name</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) &#8211; Topic options</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.delete_message">
+<tt class="descname">delete_message</tt><big>(</big><em>queue_name</em>, <em>message_id</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.delete_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.delete_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>queue_name</strong> &#8211; Queue Name</li>
+<li><strong>message_id</strong> &#8211; Message id</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.delete_queue">
+<tt class="descname">delete_queue</tt><big>(</big><em>queue_name</em>, <em>force=False</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.delete_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.delete_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete Queue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>queue_name</strong> &#8211; Queue Name</li>
+<li><strong>force</strong> &#8211; (optional) Force queue to be deleted even if there
+are pending messages</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.delete_subscription">
+<tt class="descname">delete_subscription</tt><big>(</big><em>topic_name</em>, <em>subscription_id</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.delete_subscription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.delete_subscription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a subscription</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>topic_name</strong> &#8211; Topic Name</li>
+<li><strong>subscription_id</strong> &#8211; Subscription id</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.delete_topic">
+<tt class="descname">delete_topic</tt><big>(</big><em>topic_name</em>, <em>force=False</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.delete_topic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.delete_topic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete Topic</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>topic_name</strong> &#8211; Topic Name</li>
+<li><strong>force</strong> &#8211; (optional) Force topic to be deleted even if there
+are attached subscribers</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.get_queue">
+<tt class="descname">get_queue</tt><big>(</big><em>queue_name</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.get_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.get_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get queue details</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>queue_name</strong> &#8211; Queue Name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.get_queues">
+<tt class="descname">get_queues</tt><big>(</big><em>tags=None</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.get_queues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.get_queues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get listing of queues</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tags</strong> (<em>list</em>) &#8211; (optional) list of tags to filter by</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.get_subscriptions">
+<tt class="descname">get_subscriptions</tt><big>(</big><em>topic_name</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.get_subscriptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.get_subscriptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Listing of subscriptions on a topic</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>topic_name</strong> &#8211; Topic Name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.get_topic">
+<tt class="descname">get_topic</tt><big>(</big><em>topic_name</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.get_topic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.get_topic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get topic details</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>topic_name</strong> &#8211; Topic Name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.get_topics">
+<tt class="descname">get_topics</tt><big>(</big><em>tags=None</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.get_topics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.get_topics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get listing of topics</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tags</strong> (<em>list</em>) &#8211; (optional) list of tags to filter by</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.modify_queue">
+<tt class="descname">modify_queue</tt><big>(</big><em>queue_name</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.modify_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.modify_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modify Queue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>queue_name</strong> &#8211; Queue Name</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) &#8211; queue options</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.modify_topic">
+<tt class="descname">modify_topic</tt><big>(</big><em>topic_name</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.modify_topic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.modify_topic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modify Topic</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>topic_name</strong> &#8211; Topic Name</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) &#8211; Topic options</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.pop_message">
+<tt class="descname">pop_message</tt><big>(</big><em>queue_name</em>, <em>count=1</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.pop_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.pop_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pop message from a queue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>queue_name</strong> &#8211; Queue Name</li>
+<li><strong>count</strong> &#8211; (optional) number of messages to retrieve</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.push_queue_message">
+<tt class="descname">push_queue_message</tt><big>(</big><em>queue_name</em>, <em>body</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.push_queue_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.push_queue_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Queue Message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>queue_name</strong> &#8211; Queue Name</li>
+<li><strong>body</strong> &#8211; Message body</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) &#8211; Message options</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.push_topic_message">
+<tt class="descname">push_topic_message</tt><big>(</big><em>topic_name</em>, <em>body</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.push_topic_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.push_topic_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Topic Message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>topic_name</strong> &#8211; Topic Name</li>
+<li><strong>body</strong> &#8211; Message body</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) &#8211; Topic message options</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingConnection.stats">
+<tt class="descname">stats</tt><big>(</big><em>period='hour'</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingConnection.stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingConnection.stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get account stats</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>period</strong> &#8211; &#8216;hour&#8217;, &#8216;day&#8217;, &#8216;week&#8217;, &#8216;month&#8217;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="SoftLayer.managers.messaging.MessagingManager">
+<em class="property">class </em><tt class="descclassname">SoftLayer.managers.messaging.</tt><tt class="descname">MessagingManager</tt><big>(</big><em>client</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manage SoftLayer Message Queue</p>
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingManager.get_connection">
+<tt class="descname">get_connection</tt><big>(</big><em>id</em>, <em>username</em>, <em>api_key</em>, <em>datacenter=None</em>, <em>network=None</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingManager.get_connection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingManager.get_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get connection to Message Queue Service</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> &#8211; Message Queue Account id</li>
+<li><strong>username</strong> &#8211; SoftLayer username</li>
+<li><strong>api_key</strong> &#8211; SoftLayer API key</li>
+<li><strong>datacenter</strong> &#8211; Datacenter code</li>
+<li><strong>network</strong> &#8211; network (&#8216;public&#8217; or &#8216;private&#8217;)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingManager.get_endpoint">
+<tt class="descname">get_endpoint</tt><big>(</big><em>datacenter=None</em>, <em>network=None</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingManager.get_endpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingManager.get_endpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a message queue endpoint based on datacenter/network type</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>datacenter</strong> &#8211; datacenter code</li>
+<li><strong>network</strong> &#8211; network (&#8216;public&#8217; or &#8216;private&#8217;)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingManager.get_endpoints">
+<tt class="descname">get_endpoints</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingManager.get_endpoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingManager.get_endpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all known message queue endpoints</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingManager.list_accounts">
+<tt class="descname">list_accounts</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingManager.list_accounts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingManager.list_accounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>List message queue accounts</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> (<em>dict</em>) &#8211; response-level arguments (limit, offset, etc.)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.MessagingManager.ping">
+<tt class="descname">ping</tt><big>(</big><em>datacenter=None</em>, <em>network=None</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#MessagingManager.ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.MessagingManager.ping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="SoftLayer.managers.messaging.QueueAuth">
+<em class="property">class </em><tt class="descclassname">SoftLayer.managers.messaging.</tt><tt class="descname">QueueAuth</tt><big>(</big><em>endpoint</em>, <em>username</em>, <em>api_key</em>, <em>auth_token=None</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#QueueAuth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.QueueAuth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Message Queue authentication for requests</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>endpoint</strong> &#8211; endpoint URL</li>
+<li><strong>username</strong> &#8211; SoftLayer username</li>
+<li><strong>api_key</strong> &#8211; SoftLayer API Key</li>
+<li><strong>auth_token</strong> &#8211; (optional) Starting auth token</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.QueueAuth.auth">
+<tt class="descname">auth</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#QueueAuth.auth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.QueueAuth.auth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do Authentication</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.messaging.QueueAuth.handle_error">
+<tt class="descname">handle_error</tt><big>(</big><em>r</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/SoftLayer/managers/messaging.html#QueueAuth.handle_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.managers.messaging.QueueAuth.handle_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle errors</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="hardware.html"
+                        title="previous chapter">SoftLayer.hardware</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="metadata.html"
+                        title="next chapter">SoftLayer.metadata</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/managers/messaging.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="metadata.html" title="SoftLayer.metadata"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="hardware.html" title="SoftLayer.hardware"
+             >previous</a> |</li>
+        <li><a href="../../index.html">SoftLayer API Python Client 2.3.0 documentation</a> &raquo;</li>
+          <li><a href="../managers.html" >Managers</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, SoftLayer Technologies, Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

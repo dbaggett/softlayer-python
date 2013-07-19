@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -6,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Developer Interface &mdash; SoftLayer API Python Client 2.2.0 documentation</title>
+    <title>Developer Interface &mdash; SoftLayer API Python Client 2.3.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.2.0',
+        VERSION:     '2.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +24,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="SoftLayer API Python Client 2.2.0 documentation" href="../index.html" />
+    <link rel="top" title="SoftLayer API Python Client 2.3.0 documentation" href="../index.html" />
     <link rel="next" title="Managers" href="managers.html" />
     <link rel="prev" title="Installation" href="../install.html" /> 
   </head>
@@ -43,7 +44,7 @@
         <li class="right" >
           <a href="../install.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">SoftLayer API Python Client 2.2.0 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">SoftLayer API Python Client 2.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -141,7 +142,7 @@
 <h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="SoftLayer.Client">
-<em class="property">class </em><tt class="descclassname">SoftLayer.</tt><tt class="descname">Client</tt><big>(</big><em>service_name=None</em>, <em>id=None</em>, <em>username=None</em>, <em>api_key=None</em>, <em>endpoint_url=None</em>, <em>timeout=None</em>, <em>verbose=False</em>, <em>auth=None</em><big>)</big><a class="headerlink" href="#SoftLayer.Client" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">SoftLayer.</tt><tt class="descname">Client</tt><big>(</big><em>service_name=None</em>, <em>id=None</em>, <em>username=None</em>, <em>api_key=None</em>, <em>endpoint_url=None</em>, <em>timeout=None</em>, <em>auth=None</em><big>)</big><a class="headerlink" href="#SoftLayer.Client" title="Permalink to this definition">¶</a></dt>
 <dd><p>A SoftLayer API client.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -160,7 +161,6 @@ built in API key</li>
 Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer&#8217;s private
 network.</li>
 <li><strong>timeout</strong> (<em>integer</em>) &#8211; timeout for API requests</li>
-<li><strong>verbose</strong> (<em>boolean</em>) &#8211; prints details about every HTTP request if true</li>
 <li><strong>auth</strong> &#8211; an object which responds to get_headers() to be inserted into
 the xml-rpc headers. Example: <cite>BasicAuthentication</cite></li>
 </ul>
@@ -190,7 +190,8 @@ the xml-rpc headers. Example: <cite>BasicAuthentication</cite></li>
 </table>
 <dl class="docutils">
 <dt>Usage:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="p">[</span><span class="s">&#39;Account&#39;</span><span class="p">]</span>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">SoftLayer</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="p">[</span><span class="s">&#39;Account&#39;</span><span class="p">]</span>
 <span class="go">&lt;Service: Account&gt;</span>
 </pre></div>
 </div>
@@ -199,45 +200,25 @@ the xml-rpc headers. Example: <cite>BasicAuthentication</cite></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="SoftLayer.Client.add_header">
-<tt class="descname">add_header</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#SoftLayer.Client.add_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set a SoftLayer API call header.</p>
+<dt id="SoftLayer.Client.authenticate_with_password">
+<tt class="descname">authenticate_with_password</tt><big>(</big><em>username</em>, <em>password</em>, <em>security_question_id=None</em>, <em>security_question_answer=None</em><big>)</big><a class="headerlink" href="#SoftLayer.Client.authenticate_with_password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs Username/Password Authentication and gives back an auth
+handler to use to create a client that uses token-based auth.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> &#8211; the header name</li>
-<li><strong>value</strong> &#8211; the header value</li>
+<li><strong>username</strong> (<em>string</em>) &#8211; your SoftLayer username</li>
+<li><strong>password</strong> (<em>string</em>) &#8211; your SoftLayer password</li>
+<li><strong>security_question_id</strong> (<em>int</em>) &#8211; The security question id to answer</li>
+<li><strong>security_question_answer</strong> (<em>string</em>) &#8211; The answer to the security
+question</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<div class="deprecated">
-<p><span>Deprecated since version 2.0.0.</span></p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="SoftLayer.Client.add_raw_header">
-<tt class="descname">add_raw_header</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#SoftLayer.Client.add_raw_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set HTTP headers for API calls.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> &#8211; the header name</li>
-<li><strong>value</strong> &#8211; the header value</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="deprecated">
-<p><span>Deprecated since version 2.0.0.</span></p>
-</div>
 </dd></dl>
 
 <dl class="method">
@@ -262,7 +243,8 @@ the xml-rpc headers. Example: <cite>BasicAuthentication</cite></li>
 </table>
 <dl class="docutils">
 <dt>Usage:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="p">[</span><span class="s">&#39;Account&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getVirtualGuests</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">SoftLayer</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="p">[</span><span class="s">&#39;Account&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getVirtualGuests</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="go">[...]</span>
 </pre></div>
 </div>
@@ -290,120 +272,6 @@ the xml-rpc headers. Example: <cite>BasicAuthentication</cite></li>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="SoftLayer.Client.remove_header">
-<tt class="descname">remove_header</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#SoftLayer.Client.remove_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove a SoftLayer API call header.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; the header name</td>
-</tr>
-</tbody>
-</table>
-<div class="deprecated">
-<p><span>Deprecated since version 2.0.0.</span></p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="SoftLayer.Client.set_authentication">
-<tt class="descname">set_authentication</tt><big>(</big><em>username</em>, <em>api_key</em><big>)</big><a class="headerlink" href="#SoftLayer.Client.set_authentication" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set user and key to authenticate a SoftLayer API call.</p>
-<p>Use this method if you wish to bypass the API_USER and API_KEY class
-constants and set custom authentication per API call.</p>
-<p>See <a class="reference external" href="https://manage.softlayer.com/Administrative/apiKeychain">https://manage.softlayer.com/Administrative/apiKeychain</a> for more
-information.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>username</strong> &#8211; the username to authenticate with</li>
-<li><strong>api_key</strong> &#8211; the user&#8217;s API key</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="deprecated">
-<p><span>Deprecated since version 2.0.0.</span></p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="SoftLayer.Client.set_init_parameter">
-<tt class="descname">set_init_parameter</tt><big>(</big><em>id</em><big>)</big><a class="headerlink" href="#SoftLayer.Client.set_init_parameter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set an initialization parameter header.</p>
-<p>Initialization parameters instantiate a SoftLayer API service object to
-act upon during your API method call. For instance, if your account has
-a server with ID number 1234, then setting an initialization parameter
-of 1234 in the SoftLayer_Hardware_Server Service instructs the API to
-act on server record 1234 in your method calls.</p>
-<p>See <a class="reference external" href="http://sldn.softlayer.com/article/Using-Initialization-Parameters-SoftLayer-API">http://sldn.softlayer.com/article/Using-Initialization-Parameters-SoftLayer-API</a>  # NOQA
-for more information.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> &#8211; the ID of the SoftLayer API object to instantiate</td>
-</tr>
-</tbody>
-</table>
-<div class="deprecated">
-<p><span>Deprecated since version 2.0.0.</span></p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="SoftLayer.Client.set_object_mask">
-<tt class="descname">set_object_mask</tt><big>(</big><em>mask</em><big>)</big><a class="headerlink" href="#SoftLayer.Client.set_object_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set an object mask to a SoftLayer API call.</p>
-<p>Use an object mask to retrieve data related your API call&#8217;s result.
-Object masks are skeleton objects, or strings that define nested
-relational properties to retrieve along with an object&#8217;s local
-properties. See
-<a class="reference external" href="http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API">http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API</a>
-for more information.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mask</strong> &#8211; the object mask you wish to define</td>
-</tr>
-</tbody>
-</table>
-<div class="deprecated">
-<p><span>Deprecated since version 2.0.0.</span></p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="SoftLayer.Client.set_result_limit">
-<tt class="descname">set_result_limit</tt><big>(</big><em>limit</em>, <em>offset=0</em><big>)</big><a class="headerlink" href="#SoftLayer.Client.set_result_limit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set a result limit on a SoftLayer API call.</p>
-<p>Many SoftLayer API methods return a group of results. These methods
-support a way to limit the number of results retrieved from the
-SoftLayer API in a way akin to an SQL LIMIT statement.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>limit</strong> &#8211; the number of results to limit a SoftLayer API call to</li>
-<li><strong>offset</strong> &#8211; An optional offset at which to begin a SoftLayer API
-call&#8217;s returned result</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="deprecated">
-<p><span>Deprecated since version 2.0.0.</span></p>
-</div>
 </dd></dl>
 
 </dd></dl>
@@ -541,7 +409,7 @@ results</li>
 
 <dl class="exception">
 <dt id="SoftLayer.exceptions.DNSZoneNotFound">
-<em class="property">exception </em><tt class="descclassname">SoftLayer.exceptions.</tt><tt class="descname">DNSZoneNotFound</tt><a class="headerlink" href="#SoftLayer.exceptions.DNSZoneNotFound" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><tt class="descclassname">SoftLayer.exceptions.</tt><tt class="descname">DNSZoneNotFound</tt><a class="reference internal" href="../_modules/SoftLayer/exceptions.html#DNSZoneNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.exceptions.DNSZoneNotFound" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
@@ -613,6 +481,12 @@ from the API.</p>
 </dd></dl>
 
 <dl class="exception">
+<dt id="SoftLayer.exceptions.Unauthenticated">
+<em class="property">exception </em><tt class="descclassname">SoftLayer.exceptions.</tt><tt class="descname">Unauthenticated</tt><a class="headerlink" href="#SoftLayer.exceptions.Unauthenticated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unauthenticated</p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="SoftLayer.exceptions.UnsupportedEncoding">
 <em class="property">exception </em><tt class="descclassname">SoftLayer.exceptions.</tt><tt class="descname">UnsupportedEncoding</tt><big>(</big><em>faultCode</em>, <em>faultString</em>, <em>*args</em><big>)</big><a class="reference internal" href="../_modules/SoftLayer/exceptions.html#UnsupportedEncoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.exceptions.UnsupportedEncoding" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -622,6 +496,180 @@ from the API.</p>
 <div class="section" id="backwards-compatibility">
 <h2>Backwards Compatibility<a class="headerlink" href="#backwards-compatibility" title="Permalink to this headline">¶</a></h2>
 <p>If you&#8217;ve been using the older Python client (&lt;2.0), you&#8217;ll be happy to know that the old API is still currently working. However, you should deprecate use of the old stuff. Below is an example of the old API converted to the new one.</p>
+<span class="target" id="module-SoftLayer.deprecated"></span><div class="section" id="softlayer-deprecated">
+<h3>SoftLayer.deprecated<a class="headerlink" href="#softlayer-deprecated" title="Permalink to this headline">¶</a></h3>
+<p>This is where deprecated APIs go for their eternal slumber</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body"><ol class="first loweralpha simple" start="3">
+<li>2013, SoftLayer Technologies, Inc. All rights reserved.</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body"><p class="first last">BSD, see LICENSE for more details.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="SoftLayer.deprecated.DeprecatedClientMixin">
+<em class="property">class </em><tt class="descclassname">SoftLayer.deprecated.</tt><tt class="descname">DeprecatedClientMixin</tt><big>(</big><em>id=None</em>, <em>username=None</em>, <em>api_key=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/SoftLayer/deprecated.html#DeprecatedClientMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.deprecated.DeprecatedClientMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>This mixin is to be used in SoftLayer.Client so all of these methods
+should be available to the client but are all deprecated.</p>
+<dl class="method">
+<dt id="SoftLayer.deprecated.DeprecatedClientMixin.add_header">
+<tt class="descname">add_header</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="reference internal" href="../_modules/SoftLayer/deprecated.html#DeprecatedClientMixin.add_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.deprecated.DeprecatedClientMixin.add_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a SoftLayer API call header.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; the header name</li>
+<li><strong>value</strong> &#8211; the header value</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="deprecated">
+<span class="versionmodified">Deprecated since version 2.0.0.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.deprecated.DeprecatedClientMixin.add_raw_header">
+<tt class="descname">add_raw_header</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="reference internal" href="../_modules/SoftLayer/deprecated.html#DeprecatedClientMixin.add_raw_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.deprecated.DeprecatedClientMixin.add_raw_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set HTTP headers for API calls.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; the header name</li>
+<li><strong>value</strong> &#8211; the header value</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="deprecated">
+<span class="versionmodified">Deprecated since version 2.0.0.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.deprecated.DeprecatedClientMixin.remove_header">
+<tt class="descname">remove_header</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../_modules/SoftLayer/deprecated.html#DeprecatedClientMixin.remove_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.deprecated.DeprecatedClientMixin.remove_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a SoftLayer API call header.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; the header name</td>
+</tr>
+</tbody>
+</table>
+<p class="deprecated">
+<span class="versionmodified">Deprecated since version 2.0.0.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.deprecated.DeprecatedClientMixin.set_authentication">
+<tt class="descname">set_authentication</tt><big>(</big><em>username</em>, <em>api_key</em><big>)</big><a class="reference internal" href="../_modules/SoftLayer/deprecated.html#DeprecatedClientMixin.set_authentication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.deprecated.DeprecatedClientMixin.set_authentication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set user and key to authenticate a SoftLayer API call.</p>
+<p>Use this method if you wish to bypass the API_USER and API_KEY class
+constants and set custom authentication per API call.</p>
+<p>See <a class="reference external" href="https://manage.softlayer.com/Administrative/apiKeychain">https://manage.softlayer.com/Administrative/apiKeychain</a> for more
+information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>username</strong> &#8211; the username to authenticate with</li>
+<li><strong>api_key</strong> &#8211; the user&#8217;s API key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="deprecated">
+<span class="versionmodified">Deprecated since version 2.0.0.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.deprecated.DeprecatedClientMixin.set_init_parameter">
+<tt class="descname">set_init_parameter</tt><big>(</big><em>id</em><big>)</big><a class="reference internal" href="../_modules/SoftLayer/deprecated.html#DeprecatedClientMixin.set_init_parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.deprecated.DeprecatedClientMixin.set_init_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set an initialization parameter header.</p>
+<p>Initialization parameters instantiate a SoftLayer API service object to
+act upon during your API method call. For instance, if your account has
+a server with ID number 1234, then setting an initialization parameter
+of 1234 in the SoftLayer_Hardware_Server Service instructs the API to
+act on server record 1234 in your method calls.</p>
+<p>See <a class="reference external" href="http://sldn.softlayer.com/article/Using-Initialization-Parameters-SoftLayer-API">http://sldn.softlayer.com/article/Using-Initialization-Parameters-SoftLayer-API</a>  # NOQA
+for more information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> &#8211; the ID of the SoftLayer API object to instantiate</td>
+</tr>
+</tbody>
+</table>
+<p class="deprecated">
+<span class="versionmodified">Deprecated since version 2.0.0.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.deprecated.DeprecatedClientMixin.set_object_mask">
+<tt class="descname">set_object_mask</tt><big>(</big><em>mask</em><big>)</big><a class="reference internal" href="../_modules/SoftLayer/deprecated.html#DeprecatedClientMixin.set_object_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.deprecated.DeprecatedClientMixin.set_object_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set an object mask to a SoftLayer API call.</p>
+<p>Use an object mask to retrieve data related your API call&#8217;s result.
+Object masks are skeleton objects, or strings that define nested
+relational properties to retrieve along with an object&#8217;s local
+properties. See
+<a class="reference external" href="http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API">http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API</a>
+for more information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mask</strong> &#8211; the object mask you wish to define</td>
+</tr>
+</tbody>
+</table>
+<p class="deprecated">
+<span class="versionmodified">Deprecated since version 2.0.0.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.deprecated.DeprecatedClientMixin.set_result_limit">
+<tt class="descname">set_result_limit</tt><big>(</big><em>limit</em>, <em>offset=0</em><big>)</big><a class="reference internal" href="../_modules/SoftLayer/deprecated.html#DeprecatedClientMixin.set_result_limit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SoftLayer.deprecated.DeprecatedClientMixin.set_result_limit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a result limit on a SoftLayer API call.</p>
+<p>Many SoftLayer API methods return a group of results. These methods
+support a way to limit the number of results retrieved from the
+SoftLayer API in a way akin to an SQL LIMIT statement.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>limit</strong> &#8211; the number of results to limit a SoftLayer API call to</li>
+<li><strong>offset</strong> &#8211; An optional offset at which to begin a SoftLayer API
+call&#8217;s returned result</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="deprecated">
+<span class="versionmodified">Deprecated since version 2.0.0.</span></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">SoftLayer.API</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">SoftLayer</span><span class="o">.</span><span class="n">API</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="s">&#39;SoftLayer_Account&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="s">&#39;username&#39;</span><span class="p">,</span> <span class="s">&#39;api_key&#39;</span><span class="p">)</span>
 <span class="n">client</span><span class="o">.</span><span class="n">set_object_mask</span><span class="p">({</span><span class="s">&#39;ipAddresses&#39;</span> <span class="p">:</span> <span class="bp">None</span><span class="p">})</span>
@@ -748,6 +796,7 @@ from the API.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#backwards-compatibility">Backwards Compatibility</a><ul>
+<li><a class="reference internal" href="#softlayer-deprecated">SoftLayer.deprecated</a></li>
 <li><a class="reference internal" href="#deprecated-apis">Deprecated APIs</a></li>
 </ul>
 </li>
@@ -798,12 +847,12 @@ from the API.</p>
         <li class="right" >
           <a href="../install.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="../index.html">SoftLayer API Python Client 2.2.0 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">SoftLayer API Python Client 2.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, SoftLayer Technologies, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

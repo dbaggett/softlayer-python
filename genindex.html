@@ -1,4 +1,6 @@
 
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,15 +9,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &mdash; SoftLayer API Python Client 2.2.0 documentation</title>
+    <title>Index &mdash; SoftLayer API Python Client 2.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/style.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.2.0',
+        URL_ROOT:    '',
+        VERSION:     '2.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +26,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SoftLayer API Python Client 2.2.0 documentation" href="index.html" /> 
+    <link rel="top" title="SoftLayer API Python Client 2.3.0 documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">SoftLayer API Python Client 2.2.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">SoftLayer API Python Client 2.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -62,6 +64,7 @@
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -94,21 +97,33 @@
   </dt>
 
       
-  <dt><a href="api/client.html#SoftLayer.Client.add_header">add_header() (SoftLayer.Client method)</a>
+  <dt><a href="api/client.html#SoftLayer.deprecated.DeprecatedClientMixin.add_header">add_header() (SoftLayer.deprecated.DeprecatedClientMixin method)</a>
   </dt>
 
       
-  <dt><a href="api/client.html#SoftLayer.Client.add_raw_header">add_raw_header() (SoftLayer.Client method)</a>
+  <dt><a href="api/client.html#SoftLayer.deprecated.DeprecatedClientMixin.add_raw_header">add_raw_header() (SoftLayer.deprecated.DeprecatedClientMixin method)</a>
+  </dt>
+
+      
+  <dt><a href="api/client.html#SoftLayer.exceptions.ApplicationError">ApplicationError</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/client.html#SoftLayer.exceptions.ApplicationError">ApplicationError</a>
+  <dt><a href="api/managers/metadata.html#SoftLayer.managers.metadata.MetadataManager.attribs">attribs (SoftLayer.managers.metadata.MetadataManager attribute)</a>
   </dt>
 
       
-  <dt><a href="api/managers/metadata.html#SoftLayer.managers.metadata.MetadataManager.attribs">attribs (SoftLayer.managers.metadata.MetadataManager attribute)</a>
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.QueueAuth.auth">auth() (SoftLayer.managers.messaging.QueueAuth method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.authenticate">authenticate() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
+  <dt><a href="api/client.html#SoftLayer.Client.authenticate_with_password">authenticate_with_password() (SoftLayer.Client method)</a>
   </dt>
 
   </dl></td>
@@ -128,13 +143,31 @@
 
       </dl></dd>
       
+  <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.cancel_hardware">cancel_hardware() (SoftLayer.managers.hardware.HardwareManager method)</a>
+  </dt>
+
+      
   <dt><a href="api/managers/cci.html#SoftLayer.managers.cci.CCIManager.cancel_instance">cancel_instance() (SoftLayer.managers.cci.CCIManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.cancel_metal">cancel_metal() (SoftLayer.managers.hardware.HardwareManager method)</a>
   </dt>
 
       
   <dt><a href="api/managers/cci.html#SoftLayer.managers.cci.CCIManager">CCIManager (class in SoftLayer.managers.cci)</a>
   </dt>
 
+      
+  <dt><a href="api/managers/cci.html#SoftLayer.managers.cci.CCIManager.change_port_speed">change_port_speed() (SoftLayer.managers.cci.CCIManager method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.change_port_speed">(SoftLayer.managers.hardware.HardwareManager method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="api/client.html#SoftLayer.Client">Client (class in SoftLayer)</a>
   </dt>
@@ -146,7 +179,19 @@
   </dt>
 
       
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.create_queue">create_queue() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
   <dt><a href="api/managers/dns.html#SoftLayer.managers.dns.DNSManager.create_record">create_record() (SoftLayer.managers.dns.DNSManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.create_subscription">create_subscription() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.create_topic">create_topic() (SoftLayer.managers.messaging.MessagingConnection method)</a>
   </dt>
 
       
@@ -160,19 +205,39 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.delete_message">delete_message() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.delete_queue">delete_queue() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
   <dt><a href="api/managers/dns.html#SoftLayer.managers.dns.DNSManager.delete_record">delete_record() (SoftLayer.managers.dns.DNSManager method)</a>
   </dt>
 
       
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.delete_subscription">delete_subscription() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.delete_topic">delete_topic() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
   <dt><a href="api/managers/dns.html#SoftLayer.managers.dns.DNSManager.delete_zone">delete_zone() (SoftLayer.managers.dns.DNSManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/client.html#SoftLayer.deprecated.DeprecatedClientMixin">DeprecatedClientMixin (class in SoftLayer.deprecated)</a>
   </dt>
 
       
   <dt><a href="api/managers/dns.html#SoftLayer.managers.dns.DNSManager">DNSManager (class in SoftLayer.managers.dns)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api/client.html#SoftLayer.exceptions.DNSZoneNotFound">DNSZoneNotFound</a>
   </dt>
@@ -222,7 +287,23 @@
   </dt>
 
       
+  <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.get_available_dedicated_server_packages">get_available_dedicated_server_packages() (SoftLayer.managers.hardware.HardwareManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.get_bare_metal_create_options">get_bare_metal_create_options() (SoftLayer.managers.hardware.HardwareManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.get_cancellation_reasons">get_cancellation_reasons() (SoftLayer.managers.hardware.HardwareManager method)</a>
+  </dt>
+
+      
   <dt><a href="api/managers/ssl.html#SoftLayer.managers.ssl.SSLManager.get_certificate">get_certificate() (SoftLayer.managers.ssl.SSLManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.get_connection">get_connection() (SoftLayer.managers.messaging.MessagingManager method)</a>
   </dt>
 
       
@@ -230,17 +311,57 @@
   </dt>
 
       
-  <dt><a href="api/managers/firewall.html#SoftLayer.managers.firewall.FirewallManager.get_firewalls">get_firewalls() (SoftLayer.managers.firewall.FirewallManager method)</a>
+  <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.get_dedicated_server_create_options">get_dedicated_server_create_options() (SoftLayer.managers.hardware.HardwareManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.get_default_value">get_default_value() (in module SoftLayer.managers.hardware)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.get_endpoint">get_endpoint() (SoftLayer.managers.messaging.MessagingManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.get_endpoints">get_endpoints() (SoftLayer.managers.messaging.MessagingManager method)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api/managers/firewall.html#SoftLayer.managers.firewall.FirewallManager.get_firewalls">get_firewalls() (SoftLayer.managers.firewall.FirewallManager method)</a>
+  </dt>
+
       
   <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.get_hardware">get_hardware() (SoftLayer.managers.hardware.HardwareManager method)</a>
   </dt>
 
       
   <dt><a href="api/managers/cci.html#SoftLayer.managers.cci.CCIManager.get_instance">get_instance() (SoftLayer.managers.cci.CCIManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.get_queue">get_queue() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.get_queues">get_queues() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/dns.html#SoftLayer.managers.dns.DNSManager.get_records">get_records() (SoftLayer.managers.dns.DNSManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.get_subscriptions">get_subscriptions() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.get_topic">get_topic() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.get_topics">get_topics() (SoftLayer.managers.messaging.MessagingConnection method)</a>
   </dt>
 
       
@@ -253,6 +374,10 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.QueueAuth.handle_error">handle_error() (SoftLayer.managers.messaging.QueueAuth method)</a>
+  </dt>
+
       
   <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager">HardwareManager (class in SoftLayer.managers.hardware)</a>
   </dt>
@@ -300,6 +425,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.list_accounts">list_accounts() (SoftLayer.managers.messaging.MessagingManager method)</a>
+  </dt>
+
+      
   <dt><a href="api/managers/ssl.html#SoftLayer.managers.ssl.SSLManager.list_certs">list_certs() (SoftLayer.managers.ssl.SSLManager method)</a>
   </dt>
 
@@ -328,6 +457,14 @@
   </dt>
 
       
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection">MessagingConnection (class in SoftLayer.managers.messaging)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager">MessagingManager (class in SoftLayer.managers.messaging)</a>
+  </dt>
+
+      
   <dt><a href="api/managers/metadata.html#SoftLayer.managers.metadata.METADATA_ATTRIBUTES">METADATA_ATTRIBUTES (SoftLayer.managers.metadata attribute)</a>
   </dt>
 
@@ -339,6 +476,14 @@
 
       
   <dt><a href="api/client.html#SoftLayer.exceptions.MethodNotFound">MethodNotFound</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.modify_queue">modify_queue() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.modify_topic">modify_topic() (SoftLayer.managers.messaging.MessagingConnection method)</a>
   </dt>
 
   </dl></td>
@@ -362,13 +507,43 @@
   </dt>
 
       
-  <dt><a href="api/managers/metadata.html#SoftLayer.managers.metadata.MetadataManager.private_network">private_network() (SoftLayer.managers.metadata.MetadataManager method)</a>
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.ping">ping() (SoftLayer.managers.messaging.MessagingManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.place_order">place_order() (SoftLayer.managers.hardware.HardwareManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.pop_message">pop_message() (SoftLayer.managers.messaging.MessagingConnection method)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="api/managers/metadata.html#SoftLayer.managers.metadata.MetadataManager.private_network">private_network() (SoftLayer.managers.metadata.MetadataManager method)</a>
+  </dt>
+
+      
   <dt><a href="api/managers/metadata.html#SoftLayer.managers.metadata.MetadataManager.public_network">public_network() (SoftLayer.managers.metadata.MetadataManager method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.push_queue_message">push_queue_message() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.push_topic_message">push_topic_message() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.QueueAuth">QueueAuth (class in SoftLayer.managers.messaging)</a>
   </dt>
 
   </dl></td>
@@ -396,7 +571,7 @@
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/client.html#SoftLayer.Client.remove_header">remove_header() (SoftLayer.Client method)</a>
+  <dt><a href="api/client.html#SoftLayer.deprecated.DeprecatedClientMixin.remove_header">remove_header() (SoftLayer.deprecated.DeprecatedClientMixin method)</a>
   </dt>
 
       
@@ -404,6 +579,10 @@
   </dt>
 
       <dd><dl>
+        
+  <dt><a href="api/managers/dns.html#SoftLayer.managers.dns.DNSManager.resolve_ids">(SoftLayer.managers.dns.DNSManager method)</a>
+  </dt>
+
         
   <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.resolve_ids">(SoftLayer.managers.hardware.HardwareManager method)</a>
   </dt>
@@ -414,6 +593,10 @@
   </dt>
 
       <dd><dl>
+        
+  <dt><a href="api/managers/dns.html#SoftLayer.managers.dns.DNSManager.resolvers">(SoftLayer.managers.dns.DNSManager attribute)</a>
+  </dt>
+
         
   <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.resolvers">(SoftLayer.managers.hardware.HardwareManager attribute)</a>
   </dt>
@@ -426,10 +609,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/managers/dns.html#SoftLayer.managers.dns.DNSManager.search_record">search_record() (SoftLayer.managers.dns.DNSManager method)</a>
-  </dt>
-
-      
   <dt><a href="api/client.html#SoftLayer.exceptions.ServerError">ServerError</a>
   </dt>
 
@@ -438,19 +617,23 @@
   </dt>
 
       
-  <dt><a href="api/client.html#SoftLayer.Client.set_authentication">set_authentication() (SoftLayer.Client method)</a>
+  <dt><a href="api/client.html#SoftLayer.deprecated.DeprecatedClientMixin.set_authentication">set_authentication() (SoftLayer.deprecated.DeprecatedClientMixin method)</a>
   </dt>
 
       
-  <dt><a href="api/client.html#SoftLayer.Client.set_init_parameter">set_init_parameter() (SoftLayer.Client method)</a>
+  <dt><a href="api/client.html#SoftLayer.deprecated.DeprecatedClientMixin.set_init_parameter">set_init_parameter() (SoftLayer.deprecated.DeprecatedClientMixin method)</a>
   </dt>
 
       
-  <dt><a href="api/client.html#SoftLayer.Client.set_object_mask">set_object_mask() (SoftLayer.Client method)</a>
+  <dt><a href="api/client.html#SoftLayer.deprecated.DeprecatedClientMixin.set_object_mask">set_object_mask() (SoftLayer.deprecated.DeprecatedClientMixin method)</a>
   </dt>
 
       
-  <dt><a href="api/client.html#SoftLayer.Client.set_result_limit">set_result_limit() (SoftLayer.Client method)</a>
+  <dt><a href="api/client.html#SoftLayer.deprecated.DeprecatedClientMixin.set_result_limit">set_result_limit() (SoftLayer.deprecated.DeprecatedClientMixin method)</a>
+  </dt>
+
+      
+  <dt><a href="api/client.html#module-SoftLayer.deprecated">SoftLayer.deprecated (module)</a>
   </dt>
 
       
@@ -461,18 +644,22 @@
   <dt><a href="api/managers/cci.html#module-SoftLayer.managers.cci">SoftLayer.managers.cci (module)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api/managers/dns.html#module-SoftLayer.managers.dns">SoftLayer.managers.dns (module)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api/managers/firewall.html#module-SoftLayer.managers.firewall">SoftLayer.managers.firewall (module)</a>
   </dt>
 
       
   <dt><a href="api/managers/hardware.html#module-SoftLayer.managers.hardware">SoftLayer.managers.hardware (module)</a>
+  </dt>
+
+      
+  <dt><a href="api/managers/messaging.html#module-SoftLayer.managers.messaging">SoftLayer.managers.messaging (module)</a>
   </dt>
 
       
@@ -499,6 +686,10 @@
   <dt><a href="api/managers/ssl.html#SoftLayer.managers.ssl.SSLManager">SSLManager (class in SoftLayer.managers.ssl)</a>
   </dt>
 
+      
+  <dt><a href="api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.stats">stats() (SoftLayer.managers.messaging.MessagingConnection method)</a>
+  </dt>
+
   </dl></td>
 </tr></table>
 
@@ -516,6 +707,12 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="api/client.html#SoftLayer.exceptions.Unauthenticated">Unauthenticated</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
   <dt><a href="api/client.html#SoftLayer.exceptions.UnsupportedEncoding">UnsupportedEncoding</a>
   </dt>
 
@@ -527,6 +724,12 @@
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api/managers/cci.html#SoftLayer.managers.cci.CCIManager.verify_create_instance">verify_create_instance() (SoftLayer.managers.cci.CCIManager method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api/managers/hardware.html#SoftLayer.managers.hardware.HardwareManager.verify_order">verify_order() (SoftLayer.managers.hardware.HardwareManager method)</a>
   </dt>
 
   </dl></td>
@@ -578,12 +781,12 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">SoftLayer API Python Client 2.2.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">SoftLayer API Python Client 2.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, SoftLayer Technologies, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
