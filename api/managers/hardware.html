@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>SoftLayer.hardware &mdash; SoftLayer API Python Client 2.3.0 documentation</title>
+    <title>SoftLayer.hardware &mdash; SoftLayer API Python Client 2.3.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.3.0',
+        VERSION:     '2.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="SoftLayer API Python Client 2.3.0 documentation" href="../../index.html" />
+    <link rel="top" title="SoftLayer API Python Client 2.3.1 documentation" href="../../index.html" />
     <link rel="up" title="Managers" href="../managers.html" />
     <link rel="next" title="SoftLayer.messaging" href="messaging.html" />
     <link rel="prev" title="SoftLayer.firewall" href="firewall.html" /> 
@@ -45,7 +44,7 @@
         <li class="right" >
           <a href="firewall.html" title="SoftLayer.firewall"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">SoftLayer API Python Client 2.3.0 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">SoftLayer API Python Client 2.3.1 documentation</a> &raquo;</li>
           <li><a href="../managers.html" accesskey="U">Managers</a> &raquo;</li> 
       </ul>
     </div>  
@@ -131,6 +130,32 @@ scheduled to cancel on the anniversary date.</li>
 True (default) means the public interface.
 False indicates the private interface.</li>
 <li><strong>speed</strong> (<em>int</em>) &#8211; The port speed to set.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="SoftLayer.managers.hardware.HardwareManager.edit">
+<tt class="descname">edit</tt><big>(</big><em>id</em>, <em>userdata=None</em>, <em>hostname=None</em>, <em>domain=None</em>, <em>notes=None</em><big>)</big><a class="headerlink" href="#SoftLayer.managers.hardware.HardwareManager.edit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Edit hostname, domain name, notes, and/or the</dt>
+<dd>user data of the hardware</dd>
+</dl>
+<p>Parameters set to None will be ignored and not attempted to be updated.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>integer</em>) &#8211; the instance ID to edit</li>
+<li><strong>userdata</strong> (<em>string</em>) &#8211; user data on the hardware to edit.
+If none exist it will be created</li>
+<li><strong>hostname</strong> (<em>string</em>) &#8211; valid hostname</li>
+<li><strong>domain</strong> (<em>string</em>) &#8211; valid domain namem</li>
+<li><strong>notes</strong> (<em>string</em>) &#8211; notes about this particular hardware</li>
 </ul>
 </td>
 </tr>
@@ -245,8 +270,10 @@ after reload</li>
 <dl class="method">
 <dt id="SoftLayer.managers.hardware.HardwareManager.resolve_ids">
 <tt class="descname">resolve_ids</tt><big>(</big><em>identifier</em><big>)</big><a class="headerlink" href="#SoftLayer.managers.hardware.HardwareManager.resolve_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p>Takes a string and tries to resolve to a list of matching ids. What
-exactly &#8216;identifier&#8217; can be depends on the resolvers</p>
+<dd><dl class="docutils">
+<dt>Takes a string and tries to resolve to a list of matching ids. What</dt>
+<dd>exactly &#8216;identifier&#8217; can be depends on the resolvers</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -329,13 +356,13 @@ it. See _generate_create_dict for a list of available options.</p>
         <li class="right" >
           <a href="firewall.html" title="SoftLayer.firewall"
              >previous</a> |</li>
-        <li><a href="../../index.html">SoftLayer API Python Client 2.3.0 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">SoftLayer API Python Client 2.3.1 documentation</a> &raquo;</li>
           <li><a href="../managers.html" >Managers</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, SoftLayer Technologies, Inc..
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

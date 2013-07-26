@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>SoftLayer.managers.messaging &mdash; SoftLayer API Python Client 2.3.0 documentation</title>
+    <title>SoftLayer.managers.messaging &mdash; SoftLayer API Python Client 2.3.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.3.0',
+        VERSION:     '2.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="SoftLayer API Python Client 2.3.0 documentation" href="../../../index.html" />
+    <link rel="top" title="SoftLayer API Python Client 2.3.1 documentation" href="../../../index.html" />
     <link rel="up" title="SoftLayer.managers" href="../managers.html" /> 
   </head>
   <body>
@@ -37,7 +36,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">SoftLayer API Python Client 2.3.0 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">SoftLayer API Python Client 2.3.1 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../../SoftLayer.html" >SoftLayer</a> &raquo;</li>
           <li><a href="../managers.html" accesskey="U">SoftLayer.managers</a> &raquo;</li> 
@@ -65,7 +64,13 @@
 
 
 <div class="viewcode-block" id="QueueAuth"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.QueueAuth">[docs]</a><span class="k">class</span> <span class="nc">QueueAuth</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">AuthBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Attaches User Authentication to the given request object&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Message Queue authentication for requests</span>
+
+<span class="sd">    :param endpoint: endpoint URL</span>
+<span class="sd">    :param username: SoftLayer username</span>
+<span class="sd">    :param api_key: SoftLayer API Key</span>
+<span class="sd">    :param auth_token: (optional) Starting auth token</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">api_key</span><span class="p">,</span> <span class="n">auth_token</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
@@ -73,6 +78,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span> <span class="o">=</span> <span class="n">auth_token</span>
 
 <div class="viewcode-block" id="QueueAuth.auth"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.QueueAuth.auth">[docs]</a>    <span class="k">def</span> <span class="nf">auth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Do Authentication &quot;&quot;&quot;</span>
         <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s">&#39;X-Auth-User&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
             <span class="s">&#39;X-Auth-Key&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span>
@@ -84,6 +90,7 @@
             <span class="k">raise</span> <span class="n">Unauthenticated</span><span class="p">(</span><span class="s">&quot;Error while authenticating&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="QueueAuth.handle_error"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.QueueAuth.handle_error">[docs]</a>    <span class="k">def</span> <span class="nf">handle_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Handle errors &quot;&quot;&quot;</span>
         <span class="n">r</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">deregister_hook</span><span class="p">(</span><span class="s">&#39;response&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_error</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">503</span><span class="p">:</span>
             <span class="n">r</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">anyway</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -93,6 +100,9 @@
             <span class="n">r</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">anyway</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </div>
     <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Attach auth token to the request. Do authentication if an auth</span>
+<span class="sd">            token isn&#39;t available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">auth</span><span class="p">()</span>
         <span class="n">r</span><span class="o">.</span><span class="n">register_hook</span><span class="p">(</span><span class="s">&#39;response&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_error</span><span class="p">)</span>
@@ -101,11 +111,15 @@
 
 </div>
 <div class="viewcode-block" id="MessagingManager"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager">[docs]</a><span class="k">class</span> <span class="nc">MessagingManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Manage SoftLayer Message Queue &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
 
 <div class="viewcode-block" id="MessagingManager.list_accounts"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.list_accounts">[docs]</a>    <span class="k">def</span> <span class="nf">list_accounts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; List message queue accounts</span>
+
+<span class="sd">        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s">&#39;mask&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">items</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
                 <span class="s">&#39;id&#39;</span><span class="p">,</span>
@@ -117,58 +131,87 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">[</span><span class="s">&#39;Account&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getMessageQueueAccounts</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="MessagingManager.get_endpoint"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.get_endpoint">[docs]</a>    <span class="k">def</span> <span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">endpoint_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">endpoint_name</span> <span class="o">=</span> <span class="s">&#39;dal05&#39;</span>
+<div class="viewcode-block" id="MessagingManager.get_endpoint"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.get_endpoint">[docs]</a>    <span class="k">def</span> <span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datacenter</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a message queue endpoint based on datacenter/network type</span>
+
+<span class="sd">        :param datacenter: datacenter code</span>
+<span class="sd">        :param network: network (&#39;public&#39; or &#39;private&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">datacenter</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">datacenter</span> <span class="o">=</span> <span class="s">&#39;dal05&#39;</span>
         <span class="k">if</span> <span class="n">network</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">network</span> <span class="o">=</span> <span class="s">&#39;public&#39;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">host</span> <span class="o">=</span> <span class="n">ENDPOINTS</span><span class="p">[</span><span class="n">endpoint_name</span><span class="p">][</span><span class="n">network</span><span class="p">]</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">ENDPOINTS</span><span class="p">[</span><span class="n">datacenter</span><span class="p">][</span><span class="n">network</span><span class="p">]</span>
             <span class="k">return</span> <span class="s">&quot;https://</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">host</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Invalid endpoint </span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">&#39;</span>
-                            <span class="o">%</span> <span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="n">network</span><span class="p">))</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="n">datacenter</span><span class="p">,</span> <span class="n">network</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="MessagingManager.get_endpoints"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.get_endpoints">[docs]</a>    <span class="k">def</span> <span class="nf">get_endpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get all known message queue endpoints &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ENDPOINTS</span>
 </div>
-<div class="viewcode-block" id="MessagingManager.get_connection"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.get_connection">[docs]</a>    <span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">api_key</span><span class="p">,</span> <span class="n">auth_token</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                       <span class="n">endpoint_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MessagingManager.get_connection"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.get_connection">[docs]</a>    <span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">api_key</span><span class="p">,</span> <span class="n">datacenter</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                       <span class="n">network</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get connection to Message Queue Service</span>
 
+<span class="sd">        :param id: Message Queue Account id</span>
+<span class="sd">        :param username: SoftLayer username</span>
+<span class="sd">        :param api_key: SoftLayer API key</span>
+<span class="sd">        :param datacenter: Datacenter code</span>
+<span class="sd">        :param network: network (&#39;public&#39; or &#39;private&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">MessagingConnection</span><span class="p">(</span>
-            <span class="nb">id</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="n">network</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">client</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">api_key</span><span class="p">,</span> <span class="n">auth_token</span><span class="o">=</span><span class="n">auth_token</span><span class="p">)</span>
+            <span class="nb">id</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="n">datacenter</span><span class="p">,</span> <span class="n">network</span><span class="p">))</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">api_key</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">client</span>
 </div>
-<div class="viewcode-block" id="MessagingManager.ping"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.ping">[docs]</a>    <span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MessagingManager.ping"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingManager.ping">[docs]</a>    <span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datacenter</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">/v1/ping&#39;</span> <span class="o">%</span>
-                         <span class="bp">self</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="n">network</span><span class="p">))</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="n">datacenter</span><span class="p">,</span> <span class="n">network</span><span class="p">))</span>
         <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">True</span>
 
 </div></div>
 <div class="viewcode-block" id="MessagingConnection"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection">[docs]</a><span class="k">class</span> <span class="nc">MessagingConnection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Message Queue Service Connection</span>
 
+<span class="sd">    :param id: Message Queue Account id</span>
+<span class="sd">    :param endpoint: Endpoint URL</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">account_id</span> <span class="o">=</span> <span class="nb">id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">auth</span> <span class="o">=</span> <span class="bp">None</span>
 
-<div class="viewcode-block" id="MessagingConnection.make_request"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.make_request">[docs]</a>    <span class="k">def</span> <span class="nf">make_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_make_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Make request. Generally not called directly</span>
+
+<span class="sd">        :param method: HTTP Method</span>
+<span class="sd">        :param path: resource Path</span>
+<span class="sd">        :param dict \*\*kwargs: extra request arguments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s">&#39;application/json&#39;</span><span class="p">,</span>
             <span class="s">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="n">USER_AGENT</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;headers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;headers&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;headers&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;headers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">headers</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;auth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth</span>
 
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="s">&#39;v1&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">account_id</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">r</span>
-</div>
+
 <div class="viewcode-block" id="MessagingConnection.authenticate"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.authenticate">[docs]</a>    <span class="k">def</span> <span class="nf">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">api_key</span><span class="p">,</span> <span class="n">auth_token</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Make request. Generally not called directly</span>
+
+<span class="sd">        :param username: SoftLayer username</span>
+<span class="sd">        :param api_key: SoftLayer API Key</span>
+<span class="sd">        :param auth_token: (optional) Starting auth token</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">auth_endpoint</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="s">&#39;v1&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">account_id</span><span class="p">,</span> <span class="s">&#39;auth&#39;</span><span class="p">))</span>
         <span class="n">auth</span> <span class="o">=</span> <span class="n">QueueAuth</span><span class="p">(</span><span class="n">auth_endpoint</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">api_key</span><span class="p">,</span>
                          <span class="n">auth_token</span><span class="o">=</span><span class="n">auth_token</span><span class="p">)</span>
@@ -176,103 +219,192 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">auth</span> <span class="o">=</span> <span class="n">auth</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.stats"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.stats">[docs]</a>    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s">&#39;hour&#39;</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;stats/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">period</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot; Get account stats</span>
+
+<span class="sd">        :param period: &#39;hour&#39;, &#39;day&#39;, &#39;week&#39;, &#39;month&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;stats/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">period</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 
     <span class="c"># QUEUE METHODS</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.get_queues"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.get_queues">[docs]</a>    <span class="k">def</span> <span class="nf">get_queues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get listing of queues</span>
+
+<span class="sd">        :param list tags: (optional) list of tags to filter by</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">tags</span><span class="p">:</span>
             <span class="n">params</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;queues&#39;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;queues&#39;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.create_queue"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.create_queue">[docs]</a>    <span class="k">def</span> <span class="nf">create_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create Queue</span>
+
+<span class="sd">        :param queue_name: Queue Name</span>
+<span class="sd">        :param dict \*\*kwargs: queue options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">queue</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">queue</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;put&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">queue_name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;put&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">queue_name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.modify_queue"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.modify_queue">[docs]</a>    <span class="k">def</span> <span class="nf">modify_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Modify Queue</span>
+
+<span class="sd">        :param queue_name: Queue Name</span>
+<span class="sd">        :param dict \*\*kwargs: queue options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_queue</span><span class="p">(</span><span class="n">queue_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.get_queue"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.get_queue">[docs]</a>    <span class="k">def</span> <span class="nf">get_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">queue_name</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot; Get queue details</span>
+
+<span class="sd">        :param queue_name: Queue Name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">queue_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.delete_queue"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.delete_queue">[docs]</a>    <span class="k">def</span> <span class="nf">delete_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Delete Queue</span>
+
+<span class="sd">        :param queue_name: Queue Name</span>
+<span class="sd">        :param force: (optional) Force queue to be deleted even if there</span>
+<span class="sd">                      are pending messages</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
             <span class="n">params</span><span class="p">[</span><span class="s">&#39;force&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">queue_name</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">queue_name</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">True</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.push_queue_message"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.push_queue_message">[docs]</a>    <span class="k">def</span> <span class="nf">push_queue_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create Queue Message</span>
+
+<span class="sd">        :param queue_name: Queue Name</span>
+<span class="sd">        :param body: Message body</span>
+<span class="sd">        :param dict \*\*kwargs: Message options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span><span class="p">}</span>
         <span class="n">message</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;post&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">/messages&#39;</span> <span class="o">%</span> <span class="n">queue_name</span><span class="p">,</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;post&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">/messages&#39;</span> <span class="o">%</span> <span class="n">queue_name</span><span class="p">,</span>
                               <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.pop_message"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.pop_message">[docs]</a>    <span class="k">def</span> <span class="nf">pop_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">/messages&#39;</span> <span class="o">%</span> <span class="n">queue_name</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot; Pop message from a queue</span>
+
+<span class="sd">        :param queue_name: Queue Name</span>
+<span class="sd">        :param count: (optional) number of messages to retrieve</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">/messages&#39;</span> <span class="o">%</span> <span class="n">queue_name</span><span class="p">,</span>
                               <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;batch&#39;</span><span class="p">:</span> <span class="n">count</span><span class="p">})</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.delete_message"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.delete_message">[docs]</a>    <span class="k">def</span> <span class="nf">delete_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">,</span> <span class="n">message_id</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">/messages/</span><span class="si">%s</span><span class="s">&#39;</span>
+        <span class="sd">&quot;&quot;&quot; Delete a message</span>
+
+<span class="sd">        :param queue_name: Queue Name</span>
+<span class="sd">        :param message_id: Message id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="s">&#39;queues/</span><span class="si">%s</span><span class="s">/messages/</span><span class="si">%s</span><span class="s">&#39;</span>
                           <span class="o">%</span> <span class="p">(</span><span class="n">queue_name</span><span class="p">,</span> <span class="n">message_id</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">True</span>
 
     <span class="c"># TOPIC METHODS</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.get_topics"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.get_topics">[docs]</a>    <span class="k">def</span> <span class="nf">get_topics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get listing of topics</span>
+
+<span class="sd">        :param list tags: (optional) list of tags to filter by</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">tags</span><span class="p">:</span>
             <span class="n">params</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;topics&#39;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;topics&#39;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.create_topic"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.create_topic">[docs]</a>    <span class="k">def</span> <span class="nf">create_topic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create Topic</span>
+
+<span class="sd">        :param topic_name: Topic Name</span>
+<span class="sd">        :param dict \*\*kwargs: Topic options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;put&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;put&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.modify_topic"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.modify_topic">[docs]</a>    <span class="k">def</span> <span class="nf">modify_topic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Modify Topic</span>
+
+<span class="sd">        :param topic_name: Topic Name</span>
+<span class="sd">        :param dict \*\*kwargs: Topic options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_topic</span><span class="p">(</span><span class="n">topic_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.get_topic"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.get_topic">[docs]</a>    <span class="k">def</span> <span class="nf">get_topic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic_name</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot; Get topic details</span>
+
+<span class="sd">        :param topic_name: Topic Name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.delete_topic"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.delete_topic">[docs]</a>    <span class="k">def</span> <span class="nf">delete_topic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic_name</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Delete Topic</span>
+
+<span class="sd">        :param topic_name: Topic Name</span>
+<span class="sd">        :param force: (optional) Force topic to be deleted even if there</span>
+<span class="sd">                      are attached subscribers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
             <span class="n">params</span><span class="p">[</span><span class="s">&#39;force&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">True</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.push_topic_message"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.push_topic_message">[docs]</a>    <span class="k">def</span> <span class="nf">push_topic_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic_name</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create Topic Message</span>
+
+<span class="sd">        :param topic_name: Topic Name</span>
+<span class="sd">        :param body: Message body</span>
+<span class="sd">        :param dict \*\*kwargs: Topic message options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span><span class="p">}</span>
         <span class="n">message</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;post&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">/messages&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">,</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;post&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">/messages&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">,</span>
                               <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.get_subscriptions"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.get_subscriptions">[docs]</a>    <span class="k">def</span> <span class="nf">get_subscriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic_name</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">/subscriptions&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot; Listing of subscriptions on a topic</span>
+
+<span class="sd">        :param topic_name: Topic Name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">/subscriptions&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.create_subscription"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.create_subscription">[docs]</a>    <span class="k">def</span> <span class="nf">create_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic_name</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+        <span class="sd">&quot;&quot;&quot; Create Subscription</span>
+
+<span class="sd">        :param topic_name: Topic Name</span>
+<span class="sd">        :param type: type (&#39;queue&#39; or &#39;http&#39;)</span>
+<span class="sd">        :param dict \*\*kwargs: Subscription options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
             <span class="s">&#39;post&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">/subscriptions&#39;</span> <span class="o">%</span> <span class="n">topic_name</span><span class="p">,</span>
             <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;endpoint_type&#39;</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="s">&#39;endpoint&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">}))</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MessagingConnection.delete_subscription"><a class="viewcode-back" href="../../../api/managers/messaging.html#SoftLayer.managers.messaging.MessagingConnection.delete_subscription">[docs]</a>    <span class="k">def</span> <span class="nf">delete_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic_name</span><span class="p">,</span> <span class="n">subscription_id</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">/subscriptions/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+        <span class="sd">&quot;&quot;&quot; Delete a subscription</span>
+
+<span class="sd">        :param topic_name: Topic Name</span>
+<span class="sd">        :param subscription_id: Subscription id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="s">&#39;topics/</span><span class="si">%s</span><span class="s">/subscriptions/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
                           <span class="p">(</span><span class="n">topic_name</span><span class="p">,</span> <span class="n">subscription_id</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">True</span>
 </pre></div></div></div>
@@ -308,7 +440,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">SoftLayer API Python Client 2.3.0 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">SoftLayer API Python Client 2.3.1 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../../SoftLayer.html" >SoftLayer</a> &raquo;</li>
           <li><a href="../managers.html" >SoftLayer.managers</a> &raquo;</li> 
@@ -316,7 +448,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, SoftLayer Technologies, Inc..
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>
