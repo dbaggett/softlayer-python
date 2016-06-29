@@ -12,15 +12,16 @@ def make_html():
 
 def upload():
     "Upload distribution to PyPi"
-    local('python setup.py sdist register upload')
+    local('python setup.py sdist upload')
+    local('python setup.py bdist_wheel upload')
 
 
 def clean():
     puts("* Cleaning Repo")
-    dirs = ['.tox', 'SoftLayer.egg-info', 'build', 'dist']
-    for d in dirs:
-        if os.path.exists(d) and os.path.isdir(d):
-            shutil.rmtree(d)
+    directories = ['.tox', 'SoftLayer.egg-info', 'build', 'dist']
+    for directory in directories:
+        if os.path.exists(directory) and os.path.isdir(directory):
+            shutil.rmtree(directory)
 
 
 def release(version, force=False):
@@ -35,12 +36,14 @@ def release(version, force=False):
 
     clean()
 
-    puts(" * Tagging Version %s" % version_str)
-    f = 'f' if force else ''
-    local("git tag -%sam \"%s\" %s" % (f, version_str, version_str))
+    local("pip install wheel")
 
     puts(" * Uploading to PyPI")
     upload()
+
+    puts(" * Tagging Version %s" % version_str)
+    force_option = 'f' if force else ''
+    local("git tag -%sam \"%s\" %s" % (force_option, version_str, version_str))
 
     puts(" * Pushing Tag to upstream")
     local("git push upstream %s" % version_str)

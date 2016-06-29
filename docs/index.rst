@@ -2,15 +2,18 @@
 
 SoftLayer API Python Client |version|
 ========================================
-`API Docs <http://sldn.softlayer.com/reference/softlayerapi>`_ ``|``
-`Github <https://github.com/softlayer/softlayer-api-python-client>`_ ``|``
-`Issues <https://github.com/softlayer/softlayer-api-python-client/issues>`_ ``|``
+`API Docs <http://developer.softlayer.com/reference/softlayerapi>`_ ``|``
+`GitHub <https://github.com/softlayer/softlayer-python>`_ ``|``
+`Issues <https://github.com/softlayer/softlayer-python/issues>`_ ``|``
+`Pull Requests <https://github.com/softlayer/softlayer-python/pulls>`_ ``|``
 `PyPI <https://pypi.python.org/pypi/softlayer/>`_ ``|``
 `Twitter <https://twitter.com/SoftLayerDevs>`_ ``|``
 `#softlayer on freenode <irc://irc.freenode.net/#softlayer>`_
 
 
-This is the documentation to SoftLayer's Python API Bindings. These bindings use SoftLayer's `XML-RPC interface <http://sldn.softlayer.com/article/XML-RPC>`_ in order to manage SoftLayer services.
+This is the documentation to SoftLayer's Python API Bindings. These bindings
+use SoftLayer's `XML-RPC interface <http://developer.softlayer.com/article/XML-RPC>`_
+in order to manage SoftLayer services.
 
 .. toctree::
    :maxdepth: 3
@@ -34,11 +37,11 @@ Contributing
 
 External Links
 --------------
-.. toctree::
 
-   SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>
-   Source on Github <https://github.com/softlayer/softlayer-api-python-client>
-   Issues <https://github.com/softlayer/softlayer-api-python-client/issues>
-   PyPI <https://pypi.python.org/pypi/softlayer/>
-   Twitter <https://twitter.com/SoftLayerDevs>
-   #softlayer on freenode <irc://irc.freenode.net/#softlayer>
+* `SoftLayer API Documentation <http://developer.softlayer.com/reference/softlayerapi>`_
+* `Source on GitHub <https://github.com/softlayer/softlayer-python>`_
+* `Issues <https://github.com/softlayer/softlayer-python/issues>`_
+* `Pull Requests <https://github.com/softlayer/softlayer-python/pulls>`_
+* `PyPI <https://pypi.python.org/pypi/softlayer/>`_
+* `Twitter <https://twitter.com/SoftLayerDevs>`_
+* `#softlayer on freenode <irc://irc.freenode.net/#softlayer>`_

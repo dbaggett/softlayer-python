@@ -5,33 +5,57 @@
 
     :license: MIT, see LICENSE for more details.
 """
-
 import socket
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+
+import SoftLayer
+from SoftLayer.managers import ordering
+from SoftLayer import utils
+# Invalid names are ignored due to long method names and short argument names
+# pylint: disable=invalid-name, no-self-use
+
+EXTRA_CATEGORIES = ['pri_ipv6_addresses',
+                    'static_ipv6_addresses',
+                    'sec_ip_addresses']
 
 
-class HardwareManager(IdentifierMixin, object):
-    """
-    Manages hardware devices.
+class HardwareManager(utils.IdentifierMixin, object):
+    """Manage hardware devices.
+
+    Example::
+
+       # Initialize the Manager.
+       # env variables. These can also be specified in ~/.softlayer,
+       # or passed directly to SoftLayer.Client()
+       # SL_USERNAME = YOUR_USERNAME
+       # SL_API_KEY = YOUR_API_KEY
+       import SoftLayer
+       client = SoftLayer.Client()
+       mgr = SoftLayer.HardwareManager(client)
 
     :param SoftLayer.API.Client client: an API client instance
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
+                                              manager to handle ordering.
+                                              If none is provided, one will be
+                                              auto initialized.
     """
-
-    def __init__(self, client):
-        #: A valid `SoftLayer.API.Client` object that will be used for all
-        #: actions.
+    def __init__(self, client, ordering_manager=None):
         self.client = client
-        #: Reference to the SoftLayer_Hardware_Server API object.
         self.hardware = self.client['Hardware_Server']
-        #: Reference to the SoftLayer_Account API object.
         self.account = self.client['Account']
-        #: A list of resolver functions. Used primarily by the CLI to provide
-        #: a variety of methods for uniquely identifying an object such as
-        #: hostname and IP address.
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
+        if ordering_manager is None:
+            self.ordering_manager = ordering.OrderingManager(client)
+        else:
+            self.ordering_manager = ordering_manager
 
-    def cancel_hardware(self, hardware_id, reason='unneeded', comment=''):
-        """ Cancels the specified dedicated server.
+    def cancel_hardware(self, hardware_id, reason='unneeded', comment='',
+                        immediate=False):
+        """Cancels the specified dedicated server.
+
+        Example::
+
+            # Cancels hardware id 1234
+            result = mgr.cancel_hardware(hardware_id=1234)
 
         :param int hardware_id: The ID of the hardware to be cancelled.
         :param string reason: The reason code for the cancellation. This should
@@ -40,48 +64,26 @@ class HardwareManager(IdentifierMixin, object):
                                cancellation.
         """
 
+        # Get cancel reason
         reasons = self.get_cancellation_reasons()
-        cancel_reason = reasons['unneeded']
+        cancel_reason = reasons.get(reason, reasons['unneeded'])
 
-        if reason in reasons:
-            cancel_reason = reasons[reason]
-
-        # Arguments per SLDN:
-        # attachmentId - Hardware ID
-        # Reason
-        # content - Comment about the cancellation
-        # cancelAssociatedItems
-        # attachmentType - Only option is HARDWARE
-        return self.client['Ticket'].createCancelServerTicket(hardware_id,
-                                                              cancel_reason,
-                                                              comment,
-                                                              True,
-                                                              'HARDWARE')
-
-    def cancel_metal(self, hardware_id, immediate=False):
-        """ Cancels the specified bare metal instance.
-
-        :param int id: The ID of the bare metal instance to be cancelled.
-        :param bool immediate: If true, the bare metal instance will be
-                               cancelled immediately. Otherwise, it will be
-                               scheduled to cancel on the anniversary date.
-        """
         hw_billing = self.get_hardware(hardware_id,
                                        mask='mask[id, billingItem.id]')
+        if 'billingItem' not in hw_billing:
+            raise SoftLayer.SoftLayerError(
+                "No billing item found for hardware")
 
         billing_id = hw_billing['billingItem']['id']
 
-        billing_item = self.client['Billing_Item']
-
-        if immediate:
-            return billing_item.cancelService(id=billing_id)
-        else:
-            return billing_item.cancelServiceOnAnniversaryDate(id=billing_id)
+        return self.client.call('Billing_Item', 'cancelItem',
+                                immediate, False, cancel_reason, comment,
+                                id=billing_id)
 
     def list_hardware(self, tags=None, cpus=None, memory=None, hostname=None,
                       domain=None, datacenter=None, nic_speed=None,
                       public_ip=None, private_ip=None, **kwargs):
-        """ List all hardware (servers and bare metal computing instances).
+        """List all hardware (servers and bare metal computing instances).
 
         :param list tags: filter based on tags
         :param integer cpus: filter based on number of CPUS
@@ -92,14 +94,20 @@ class HardwareManager(IdentifierMixin, object):
         :param integer nic_speed: filter based on network speed (in MBPS)
         :param string public_ip: filter based on public ip address
         :param string private_ip: filter based on private ip address
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         :returns: Returns a list of dictionaries representing the matching
                   hardware. This list will contain both dedicated servers and
                   bare metal computing instances
 
+       Example::
+
+            # Using a custom object-mask. Will get ONLY what is specified
+            # These will stem from the SoftLayer_Hardware_Server datatype
+            object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
+            result = mgr.list_hardware(mask=object_mask)
         """
         if 'mask' not in kwargs:
-            hw_items = set([
+            hw_items = [
                 'id',
                 'hostname',
                 'domain',
@@ -111,17 +119,16 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter',
-            ])
-            server_items = set([
+            ]
+            server_items = [
                 'activeTransaction[id, transactionStatus[friendlyName,name]]',
-            ])
+            ]
 
-            kwargs['mask'] = '[mask[%s],' \
-                             ' mask(SoftLayer_Hardware_Server)[%s]]' % \
-                             (','.join(hw_items),
-                              ','.join(server_items))
+            kwargs['mask'] = ('[mask[%s],'
+                              ' mask(SoftLayer_Hardware_Server)[%s]]'
+                              % (','.join(hw_items), ','.join(server_items)))
 
-        _filter = NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
         if tags:
             _filter['hardware']['tagReferences']['tag']['name'] = {
                 'operation': 'in',
@@ -129,119 +136,53 @@ class HardwareManager(IdentifierMixin, object):
             }
 
         if cpus:
-            _filter['hardware']['processorPhysicalCoreAmount'] = \
-                query_filter(cpus)
+            _filter['hardware']['processorPhysicalCoreAmount'] = (
+                utils.query_filter(cpus))
 
         if memory:
-            _filter['hardware']['memoryCapacity'] = query_filter(memory)
+            _filter['hardware']['memoryCapacity'] = utils.query_filter(memory)
 
         if hostname:
-            _filter['hardware']['hostname'] = query_filter(hostname)
+            _filter['hardware']['hostname'] = utils.query_filter(hostname)
 
         if domain:
-            _filter['hardware']['domain'] = query_filter(domain)
+            _filter['hardware']['domain'] = utils.query_filter(domain)
 
         if datacenter:
-            _filter['hardware']['datacenter']['name'] = \
-                query_filter(datacenter)
+            _filter['hardware']['datacenter']['name'] = (
+                utils.query_filter(datacenter))
 
         if nic_speed:
-            _filter['hardware']['networkComponents']['maxSpeed'] = \
-                query_filter(nic_speed)
+            _filter['hardware']['networkComponents']['maxSpeed'] = (
+                utils.query_filter(nic_speed))
 
         if public_ip:
-            _filter['hardware']['primaryIpAddress'] = \
-                query_filter(public_ip)
+            _filter['hardware']['primaryIpAddress'] = (
+                utils.query_filter(public_ip))
 
         if private_ip:
-            _filter['hardware']['primaryBackendIpAddress'] = \
-                query_filter(private_ip)
+            _filter['hardware']['primaryBackendIpAddress'] = (
+                utils.query_filter(private_ip))
 
         kwargs['filter'] = _filter.to_dict()
         return self.account.getHardware(**kwargs)
 
-    def get_bare_metal_create_options(self):
-        """ Retrieves the available options for creating a bare metal server.
-
-        :returns: A dictionary of creation options. The categories to order are
-                  contained within the 'categories' key. See
-                  :func:`_parse_package_data` for detailed information.
-
-        .. note::
-
-           The information for ordering bare metal instances comes from
-           multiple API calls. In order to make the process easier, this
-           function will make those calls and reformat the results into a
-           dictionary that's easier to manage. It's recommended that you cache
-           these results with a reasonable lifetime for performance reasons.
-        """
-        hw_id = self._get_bare_metal_package_id()
-
-        if not hw_id:
-            return None
-
-        return self._parse_package_data(hw_id)
-
-    def get_available_dedicated_server_packages(self):
-        """ Retrieves a list of packages that are available for ordering
-        dedicated servers.
-
-        :returns: A list of tuples of available dedicated server packages in
-                  the form (id, name, description)
-        """
-
-        # Note - This currently returns a hard coded list until the API is
-        # updated to allow filtering on packages to just those for ordering
-        # servers.
-        package_ids = [13, 15, 23, 25, 26, 27, 29, 32, 41, 42, 43, 44, 49, 51,
-                       52, 53, 54, 55, 56, 57, 126, 140, 141, 142, 143, 144,
-                       145, 146, 147, 148, 158]
-
-        package_obj = self.client['Product_Package']
-        packages = []
-
-        for package_id in package_ids:
-            package = package_obj.getObject(id=package_id,
-                                            mask='mask[id, name, description]')
-
-            if (package.get('name')):
-                packages.append((package['id'], package['name'],
-                                 package['description']))
-
-        return packages
-
-    def get_dedicated_server_create_options(self, package_id):
-        """ Retrieves the available options for creating a dedicated server in
-        a specific chassis (based on package ID).
-
-        :param int package_id: The package ID to retrieve the creation options
-                               for. This should come from
-                               :func:`get_available_dedicated_server_packages`.
-        :returns: A dictionary of creation options. The categories to order are
-                  contained within the 'categories' key. See
-                  :func:`_parse_package_data` for detailed information.
-
-        .. note::
-
-           The information for ordering dedicated servers comes from multiple
-           API calls. In order to make the process simpler, this function will
-           make those calls and reformat the results into a dictionary that's
-           easier to manage. It's recommended that you cache these results with
-           a reasonable lifetime for performance reasons.
-        """
-        return self._parse_package_data(package_id)
-
     def get_hardware(self, hardware_id, **kwargs):
-        """ Get details about a hardware device
+        """Get details about a hardware device.
 
         :param integer id: the hardware ID
         :returns: A dictionary containing a large amount of information about
                   the specified server.
 
+        Example::
+
+            object_mask = "mask[id,networkVlans[vlanNumber]]"
+            # Object masks are optional
+            result = mgr.get_hardware(hardware_id=1234,mask=object_mask)
         """
 
         if 'mask' not in kwargs:
-            items = set([
+            items = [
                 'id',
                 'globalIdentifier',
                 'fullyQualifiedDomainName',
@@ -258,27 +199,31 @@ class HardwareManager(IdentifierMixin, object):
                 'networkManagementIpAddress',
                 'userData',
                 'datacenter',
-                'networkComponents[id, status, speed, maxSpeed, name,'
-                'ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,'
-                'port, primarySubnet]',
-                'networkComponents.primarySubnet[id, netmask,'
-                'broadcastAddress, networkIdentifier, gateway]',
+                '''networkComponents[id, status, speed, maxSpeed, name,
+                   ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,
+                   port, primarySubnet[id, netmask, broadcastAddress,
+                                       networkIdentifier, gateway]]''',
                 'hardwareChassis[id,name]',
                 'activeTransaction[id, transactionStatus[friendlyName,name]]',
-                'operatingSystem.softwareLicense.'
-                'softwareDescription[manufacturer,name,version,referenceCode]',
-                'operatingSystem.passwords[username,password]',
-                'billingItem.recurringFee',
+                '''operatingSystem[
+                    softwareLicense[softwareDescription[manufacturer,
+                                                        name,
+                                                        version,
+                                                        referenceCode]],
+                    passwords[username,password]]''',
+                'billingItem.nextInvoiceTotalRecurringAmount',
                 'hourlyBillingFlag',
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',
-            ])
+                'billingItem.orderItem.order.userRecord[username]',
+                'remoteManagementAccounts[username,password]',
+            ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
         return self.hardware.getObject(id=hardware_id, **kwargs)
 
     def reload(self, hardware_id, post_uri=None, ssh_keys=None):
-        """ Perform an OS reload of a server with its current configuration.
+        """Perform an OS reload of a server with its current configuration.
 
         :param integer hardware_id: the instance ID to reload
         :param string post_url: The URI of the post-install script to run
@@ -286,114 +231,92 @@ class HardwareManager(IdentifierMixin, object):
         :param list ssh_keys: The SSH keys to add to the root user
         """
 
-        payload = {
-            'token': 'FORCE',
-            'config': {},
-        }
+        config = {}
 
         if post_uri:
-            payload['config']['customProvisionScriptUri'] = post_uri
+            config['customProvisionScriptUri'] = post_uri
 
         if ssh_keys:
-            payload['config']['sshKeyIds'] = [key_id for key_id in ssh_keys]
+            config['sshKeyIds'] = [key_id for key_id in ssh_keys]
 
-        return self.hardware.reloadOperatingSystem('FORCE', payload['config'],
+        return self.hardware.reloadOperatingSystem('FORCE', config,
                                                    id=hardware_id)
 
+    def rescue(self, hardware_id):
+        """Reboot a server into the a recsue kernel.
+
+        :param integer instance_id: the server ID to rescue
+
+        Example::
+
+            result = mgr.rescue(1234)
+        """
+        return self.hardware.bootToRescueLayer(id=hardware_id)
+
     def change_port_speed(self, hardware_id, public, speed):
-        """ Allows you to change the port speed of a server's NICs.
+        """Allows you to change the port speed of a server's NICs.
 
         :param int hardware_id: The ID of the server
         :param bool public: Flag to indicate which interface to change.
                             True (default) means the public interface.
                             False indicates the private interface.
         :param int speed: The port speed to set.
-        """
-        if public:
-            func = self.hardware.setPublicNetworkInterfaceSpeed
-        else:
-            func = self.hardware.setPrivateNetworkInterfaceSpeed
-
-        return func(speed, id=hardware_id)
-
-    def place_order(self, **kwargs):
-        """ Places an order for a piece of hardware. See
-        :func:`_generate_create_dict` for a list of available options.
 
         .. warning::
-           Due to how the ordering structure currently works, all ordering
-           takes place using price IDs rather than quantities. See the
-           following sample for an example of using HardwareManager functions
-           for ordering a basic server.
+            A port speed of 0 will disable the interface.
 
-        ::
+        Example::
 
-           # client is assumed to be an initialized SoftLayer.API.Client object
-           mgr = HardwareManager(client)
+            #change the Public interface to 10Mbps on instance 12345
+            result = mgr.change_port_speed(hardware_id=12345,
+                                           public=True, speed=10)
+            # result will be True or an Exception
+        """
+        if public:
+            return self.client.call('Hardware_Server',
+                                    'setPublicNetworkInterfaceSpeed',
+                                    speed, id=hardware_id)
+        else:
+            return self.client.call('Hardware_Server',
+                                    'setPrivateNetworkInterfaceSpeed',
+                                    speed, id=hardware_id)
 
-           # Package ID 32 corresponds to the 'Quad Processor, Quad Core Intel'
-           # package. This information can be obtained from the
-           # :func:`get_available_dedicated_server_packages` function.
-           options = mgr.get_dedicated_server_create_options(32)
+    def place_order(self, **kwargs):
+        """Places an order for a piece of hardware.
 
-           # Review the contents of options to find the information that
-           # applies to your order. For the sake of this example, we assume
-           # that your selections are a series of item IDs for each category
-           # organized into a key-value dictionary.
+        See get_create_options() for valid arguments.
 
-           # This contains selections for all required categories
-           selections = {
-               'server': 542, # Quad Processor Quad Core Intel 7310 - 1.60GHz
-               'pri_ip_addresses': 15, # 1 IP Address
-               'notification': 51, # Email and Ticket
-               'ram': 280, # 16 GB FB-DIMM Registered 533/667
-               'bandwidth': 173, # 5000 GB Bandwidth
-               'lockbox': 45, # 1 GB Lockbox
-               'monitoring': 49, # Host Ping
-               'disk0': 14, # 500GB SATA II (for the first disk)
-               'response': 52, # Automated Notification
-               'port_speed': 187, # 100 Mbps Public & Private Networks
-               'power_supply': 469, # Redundant Power Supplies
-               'disk_controller': 487, # Non-RAID
-               'vulnerability_scanner': 307, # Nessus
-               'vpn_management': 309, # Unlimited SSL VPN Users
-               'remote_management': 504, # Reboot / KVM over IP
-               'os': 4166, # Ubuntu Linux 12.04 LTS Precise Pangolin (64 bit)
-           }
-
-           args = {
-               'location': 'FIRST_AVAILABLE', # Pick the first available DC
-               'packageId': 32, # From above
-               'disks': [],
-           }
-
-           for cat, item_id in selections:
-               for item in options['categories'][cat]['items'].items():
-                   if item['id'] == item_id:
-                       if 'disk' not in cat or 'disk_controller' == cat:
-                           args[cat] = item['price_id']
-                       else:
-                           args['disks'].append(item['price_id'])
-
-           # You can call :func:`verify_order` here to test the order instead
-           # of actually placing it if you prefer.
-           result = mgr.place_order(**args)
-
+        :param string size: server size name
+        :param string hostname: server hostname
+        :param string domain: server domain name
+        :param string location: location (datacenter) name
+        :param string os: operating system name
+        :param int port_speed: Port speed in Mbps
+        :param list ssh_keys: list of ssh key ids
+        :param string post_uri: The URI of the post-install script to run
+                                after reload
+        :param boolean hourly: True if using hourly pricing (default).
+                               False for monthly.
+        :param boolean no_public: True if this server should only have private
+                                  interfaces
+        :param list extras: List of extra feature names
         """
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].placeOrder(create_options)
 
     def verify_order(self, **kwargs):
-        """ Verifies an order for a piece of hardware without actually placing
-        it. See :func:`_generate_create_dict` for a list of available options.
+        """Verifies an order for a piece of hardware.
+
+        See :func:`place_order` for a list of available options.
         """
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].verifyOrder(create_options)
 
     def get_cancellation_reasons(self):
-        """
-        Returns a dictionary of valid cancellation reasons that can be used
-        when cancelling a dedicated server via :func:`cancel_hardware`.
+        """Returns a dictionary of valid cancellation reasons.
+
+        These can be used when cancelling a dedicated server
+        via :func:`cancel_hardware`.
         """
         return {
             'unneeded': 'No longer needed',
@@ -408,138 +331,163 @@ class HardwareManager(IdentifierMixin, object):
             'moving': 'Moving to competitor',
         }
 
-    def _generate_create_dict(
-            self, server=None, hostname=None, domain=None, hourly=False,
-            location=None, os=None, disks=None, port_speed=None,
-            bare_metal=None, ram=None, package_id=None, disk_controller=None,
-            ssh_keys=None, public_vlan=None, private_vlan=None):
-        """
-        Translates a list of arguments into a dictionary necessary for creating
-        a server.
+    def get_create_options(self):
+        """Returns valid options for ordering hardware."""
 
-        .. warning::
-           All items here must be price IDs, NOT quantities!
+        package = self._get_package()
 
-        :param int server: The identification string for the server to
-                           order. This will either be the CPU/Memory
-                           combination ID for bare metal instances or the
-                           CPU model for dedicated servers.
-        :param string hostname: The hostname to use for the new server.
-        :param string domain: The domain to use for the new server.
-        :param bool hourly: Flag to indicate if this server should be billed
-                            hourly (default) or monthly. Only applies to bare
-                            metal instances.
-        :param string location: The location string (data center) for the
-                                server
-        :param int os: The operating system to use
-        :param array disks: An array of disks for the server. Disks will be
-                            added in the order specified.
-        :param int port_speed: The port speed for the server.
-        :param bool bare_metal: Flag to indicate if this is a bare metal server
-                                or a dedicated server (default).
-        :param int ram: The amount of RAM to order. Only applies to dedicated
-                        servers.
-        :param int package_id: The package_id to use for the server. This
-                               should either be a chassis ID for dedicated
-                               servers or the bare metal instance package ID,
-                               which can be obtained by calling
-                               _get_bare_metal_package_id
-        :param int disk_controller: The disk controller to use.
-        :param list ssh_keys: The SSH keys to add to the root user
-        :param int public_vlan: The ID of the public VLAN on which you want
-                                this server placed.
-        :param int private_vlan: The ID of the public VLAN on which you want
-                                 this server placed.
-        """
-        arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
-                     'port_speed', 'bare_metal', 'ram', 'package_id',
-                     'disk_controller', 'server_core', 'disk0']
+        # Locations
+        locations = []
+        for region in package['regions']:
+            locations.append({
+                'name': region['location']['location']['longName'],
+                'key': region['location']['location']['name'],
+            })
+
+        # Sizes
+        sizes = []
+        for preset in package['activePresets']:
+            sizes.append({
+                'name': preset['description'],
+                'key': preset['keyName']
+            })
+
+        # Operating systems
+        operating_systems = []
+        for item in package['items']:
+            if item['itemCategory']['categoryCode'] == 'os':
+                operating_systems.append({
+                    'name': item['softwareDescription']['longDescription'],
+                    'key': item['softwareDescription']['referenceCode'],
+                })
+
+        # Port speeds
+        port_speeds = []
+        for item in package['items']:
+            if all([item['itemCategory']['categoryCode'] == 'port_speed',
+                    # Hide private options
+                    not _is_private_port_speed_item(item),
+                    # Hide unbonded options
+                    _is_bonded(item)]):
+                port_speeds.append({
+                    'name': item['description'],
+                    'key': item['capacity'],
+                })
+
+        # Extras
+        extras = []
+        for item in package['items']:
+            if item['itemCategory']['categoryCode'] in EXTRA_CATEGORIES:
+                extras.append({
+                    'name': item['description'],
+                    'key': item['keyName']
+                })
+
+        return {
+            'locations': locations,
+            'sizes': sizes,
+            'operating_systems': operating_systems,
+            'port_speeds': port_speeds,
+            'extras': extras,
+        }
+
+    def _get_package(self):
+        """Get the package related to simple hardware ordering."""
+        mask = '''
+items[
+    keyName,
+    capacity,
+    description,
+    attributes[id,attributeTypeKeyName],
+    itemCategory[id,categoryCode],
+    softwareDescription[id,referenceCode,longDescription],
+    prices
+],
+activePresets,
+regions[location[location[priceGroups]]]
+'''
+
+        package_type = 'BARE_METAL_CPU_FAST_PROVISION'
+        packages = self.ordering_manager.get_packages_of_type([package_type],
+                                                              mask=mask)
+        if len(packages) != 1:
+            raise SoftLayer.SoftLayerError("Ordering package not found")
+
+        return packages[0]
+
+    def _generate_create_dict(self,
+                              size=None,
+                              hostname=None,
+                              domain=None,
+                              location=None,
+                              os=None,
+                              port_speed=None,
+                              ssh_keys=None,
+                              post_uri=None,
+                              hourly=True,
+                              no_public=False,
+                              extras=None):
+        """Translates arguments into a dictionary for creating a server."""
+
+        extras = extras or []
+
+        package = self._get_package()
+        location = _get_location(package, location)
+
+        prices = []
+        for category in ['pri_ip_addresses',
+                         'vpn_management',
+                         'remote_management']:
+            prices.append(_get_default_price_id(package['items'],
+                                                option=category,
+                                                hourly=hourly,
+                                                location=location))
+
+        prices.append(_get_os_price_id(package['items'], os,
+                                       location=location))
+        prices.append(_get_bandwidth_price_id(package['items'],
+                                              hourly=hourly,
+                                              no_public=no_public,
+                                              location=location))
+        prices.append(_get_port_speed_price_id(package['items'],
+                                               port_speed,
+                                               no_public,
+                                               location=location))
+
+        for extra in extras:
+            prices.append(_get_extra_price_id(package['items'],
+                                              extra, hourly,
+                                              location=location))
 
         hardware = {
-            'bareMetalInstanceFlag': bare_metal,
             'hostname': hostname,
             'domain': domain,
         }
 
-        if public_vlan:
-            hardware['primaryNetworkComponent'] = {
-                "networkVlan": {"id": int(public_vlan)}}
-        if private_vlan:
-            hardware['primaryBackendNetworkComponent'] = {
-                "networkVlan": {"id": int(private_vlan)}}
-
         order = {
             'hardware': [hardware],
-            'location': location,
-            'prices': [],
+            'location': location['keyname'],
+            'prices': [{'id': price} for price in prices],
+            'packageId': package['id'],
+            'presetId': _get_preset_id(package, size),
+            'useHourlyPricing': hourly,
         }
+
+        if post_uri:
+            order['provisionScripts'] = [post_uri]
 
         if ssh_keys:
             order['sshKeys'] = [{'sshKeyIds': ssh_keys}]
 
-        if bare_metal:
-            order['packageId'] = self._get_bare_metal_package_id()
-            order['prices'].append({'id': int(server)})
-            p_options = self.get_bare_metal_create_options()
-            if hourly:
-                order['useHourlyPricing'] = True
-        else:
-            order['packageId'] = package_id
-            order['prices'].append({'id': int(server)})
-            p_options = self.get_dedicated_server_create_options(package_id)
-
-        if disks:
-            for disk in disks:
-                order['prices'].append({'id': int(disk)})
-
-        if os:
-            order['prices'].append({'id': int(os)})
-
-        if port_speed:
-            order['prices'].append({'id': int(port_speed)})
-
-        if ram:
-            order['prices'].append({'id': int(ram)})
-
-        if disk_controller:
-            order['prices'].append({'id': int(disk_controller)})
-
-        # Find all remaining required categories so we can auto-default them
-        required_fields = []
-        for category, data in p_options['categories'].iteritems():
-            if data.get('is_required') and category not in arguments:
-                if 'disk' in category:
-                    # This block makes sure that we can default unspecified
-                    # disks if the user hasn't specified enough.
-                    disk_count = int(category.replace('disk', ''))
-                    if len(disks) >= disk_count + 1:
-                        continue
-                required_fields.append(category)
-
-        for category in required_fields:
-            price = get_default_value(p_options, category)
-            order['prices'].append({'id': price})
-
         return order
 
-    def _get_bare_metal_package_id(self):
-        packages = self.client['Product_Package'].getAllObjects(
-            mask='mask[id, name]',
-            filter={'name': query_filter('Bare Metal Instance')})
-
-        hw_id = 0
-        for package in packages:
-            if 'Bare Metal Instance' == package['name']:
-                hw_id = package['id']
-                break
-
-        return hw_id
-
     def _get_ids_from_hostname(self, hostname):
+        """Returns list of matching hardware IDs for a given hostname."""
         results = self.list_hardware(hostname=hostname, mask="id")
         return [result['id'] for result in results]
 
     def _get_ids_from_ip(self, ip):
+        """Returns list of matching hardware IDs for a given ip address."""
         try:
             # Does it look like an ip address?
             socket.inet_aton(ip)
@@ -555,113 +503,9 @@ class HardwareManager(IdentifierMixin, object):
         if results:
             return [result['id'] for result in results]
 
-    def _parse_package_data(self, package_id):
-        """
-        Parses data from the specified package into a consistent dictionary.
-
-        The data returned by the API varies significantly from one package
-        to another, which means that consuming it can make your program more
-        complicated than desired. This function will make all necessary API
-        calls for the specified package ID and build the results into a
-        consistently formatted dictionary like so:
-
-        result = {
-            'locations': [{'delivery_information': <string>,
-                           'keyname': <string>,
-                           'long_name': <string>}],
-            'categories': {
-                'category_code': {
-                    'sort': <int>,
-                    'step': <int>,
-                    'is_required': <bool>,
-                    'name': <string>,
-                    'group': <string>,
-                    'items': [
-                        {
-                            'id': <int>,
-                            'description': <string>,
-                            'sort': <int>,
-                            'price_id': <int>,
-                            'recurring_fee': <float>,
-                            'setup_fee': <float>,
-                            'hourly_recurring_fee': <float>,
-                            'one_time_fee': <float>,
-                            'labor_fee': <float>,
-                            'capacity': <float>,
-                        }
-                    ]
-                }
-            }
-        }
-
-        Your code can rely upon each of those elements always being present.
-        Each list will contain at least one entry as well, though most will
-        contain more than one.
-        """
-        package = self.client['Product_Package']
-
-        results = {
-            'categories': {},
-            'locations': []
-        }
-
-        # First pull the list of available locations. We do it with the
-        # getObject() call so that we get access to the delivery time info.
-        object_data = package.getRegions(id=package_id)
-
-        for loc in object_data:
-            details = loc['location']['locationPackageDetails'][0]
-
-            results['locations'].append({
-                'delivery_information': details.get('deliveryTimeInformation'),
-                'keyname': loc['keyname'],
-                'long_name': loc['description'],
-            })
-
-        mask = 'mask[itemCategory[group]]'
-
-        for config in package.getConfiguration(id=package_id, mask=mask):
-            code = config['itemCategory']['categoryCode']
-            group = NestedDict(config['itemCategory']) or {}
-            category = {
-                'sort': config['sort'],
-                'step': config['orderStepId'],
-                'is_required': config['isRequired'],
-                'name': config['itemCategory']['name'],
-                'group': group['group']['name'],
-                'items': [],
-            }
-
-            results['categories'][code] = category
-
-        # Now pull in the available package item
-        for category in package.getCategories(id=package_id):
-            code = category['categoryCode']
-            items = []
-
-            for group in category['groups']:
-                for price in group['prices']:
-                    items.append({
-                        'id': price['itemId'],
-                        'description': price['item']['description'],
-                        'sort': price['sort'],
-                        'price_id': price['id'],
-                        'recurring_fee': price.get('recurringFee', 0),
-                        'setup_fee': price.get('setupFee', 0),
-                        'hourly_recurring_fee': price.get('hourlyRecurringFee',
-                                                          0),
-                        'one_time_fee': price.get('oneTimeFee', 0),
-                        'labor_fee': price.get('laborFee', 0),
-                        'capacity': float(price['item'].get('capacity', 0)),
-                    })
-            results['categories'][code]['items'] = items
-
-        return results
-
     def edit(self, hardware_id, userdata=None, hostname=None, domain=None,
-             notes=None):
-        """ Edit hostname, domain name, notes, and/or the user data of the
-        hardware
+             notes=None, tags=None):
+        """Edit hostname, domain name, notes, user data of the hardware.
 
         Parameters set to None will be ignored and not attempted to be updated.
 
@@ -669,14 +513,24 @@ class HardwareManager(IdentifierMixin, object):
         :param string userdata: user data on the hardware to edit.
                                 If none exist it will be created
         :param string hostname: valid hostname
-        :param string domain: valid domain namem
+        :param string domain: valid domain name
         :param string notes: notes about this particular hardware
+        :param string tags: tags to set on the hardware as a comma separated
+                            list. Use the empty string to remove all tags.
 
+        Example::
+
+            # Change the hostname on instance 12345 to 'something'
+            result = mgr.edit(hardware_id=12345 , hostname="something")
+            #result will be True or an Exception
         """
 
         obj = {}
         if userdata:
             self.hardware.setUserMetadata([userdata], id=hardware_id)
+
+        if tags is not None:
+            self.hardware.setTags(tags, id=hardware_id)
 
         if hostname:
             obj['hostname'] = hostname
@@ -692,32 +546,203 @@ class HardwareManager(IdentifierMixin, object):
 
         return self.hardware.editObject(obj, id=hardware_id)
 
+    def update_firmware(self,
+                        hardware_id,
+                        ipmi=True,
+                        raid_controller=True,
+                        bios=True,
+                        hard_drive=True):
+        """Update hardware firmware.
 
-def get_default_value(package_options, category):
-    """ Returns the default price ID for the specified category.
+        This will cause the server to be unavailable for ~20 minutes.
 
-    This determination is made by parsing the items in the package_options
-    argument and finding the first item that has zero specified for every fee
-    field.
+        :param int hardware_id: The ID of the hardware to have its firmware
+                                updated.
+        :param bool ipmi: Update the ipmi firmware.
+        :param bool raid_controller: Update the raid controller firmware.
+        :param bool bios: Update the bios firmware.
+        :param bool hard_drive: Update the hard drive firmware.
 
-    .. note::
-       If the category has multiple items with no fee, this will return the
-       first it finds and then short circuit. This may not match the default
-       value presented on the SoftLayer ordering portal. Additionally, this
-       method will return None if there are no free items in the category.
+        Example::
 
-    :returns: Returns the price ID of the first free item it finds or None
-              if there are no free items.
-    """
-    if category not in package_options['categories']:
-        return
+            # Check the servers active transactions to see progress
+            result = mgr.update_firmware(hardware_id=1234)
+        """
 
-    for item in package_options['categories'][category]['items']:
-        if not any([
-            float(item.get('setupFee', 0)),
-            float(item.get('recurringFee', 0)),
-            float(item.get('hourlyRecurringFee', 0)),
-            float(item.get('oneTimeFee', 0)),
-            float(item.get('laborFee', 0)),
-        ]):
-            return item['price_id']
+        return self.hardware.createFirmwareUpdateTransaction(
+            bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive),
+            id=hardware_id)
+
+
+def _get_extra_price_id(items, key_name, hourly, location):
+    """Returns a price id attached to item with the given key_name."""
+
+    for item in items:
+        if utils.lookup(item, 'keyName') != key_name:
+            continue
+
+        for price in item['prices']:
+            if not _matches_billing(price, hourly):
+                continue
+
+            if not _matches_location(price, location):
+                continue
+
+            return price['id']
+
+    raise SoftLayer.SoftLayerError(
+        "Could not find valid price for extra option, '%s'" % key_name)
+
+
+def _get_default_price_id(items, option, hourly, location):
+    """Returns a 'free' price id given an option."""
+
+    for item in items:
+        if utils.lookup(item, 'itemCategory', 'categoryCode') != option:
+            continue
+
+        for price in item['prices']:
+            if all([float(price.get('hourlyRecurringFee', 0)) == 0.0,
+                    float(price.get('recurringFee', 0)) == 0.0,
+                    _matches_billing(price, hourly),
+                    _matches_location(price, location)]):
+                return price['id']
+
+    raise SoftLayer.SoftLayerError(
+        "Could not find valid price for '%s' option" % option)
+
+
+def _get_bandwidth_price_id(items,
+                            hourly=True,
+                            no_public=False,
+                            location=None):
+    """Choose a valid price id for bandwidth."""
+
+    # Prefer pay-for-use data transfer with hourly
+    for item in items:
+
+        capacity = float(item.get('capacity', 0))
+        # Hourly and private only do pay-as-you-go bandwidth
+        if any([utils.lookup(item,
+                             'itemCategory',
+                             'categoryCode') != 'bandwidth',
+                (hourly or no_public) and capacity != 0.0,
+                not (hourly or no_public) and capacity == 0.0]):
+            continue
+
+        for price in item['prices']:
+            if not _matches_billing(price, hourly):
+                continue
+            if not _matches_location(price, location):
+                continue
+
+            return price['id']
+
+    raise SoftLayer.SoftLayerError(
+        "Could not find valid price for bandwidth option")
+
+
+def _get_os_price_id(items, os, location):
+    """Returns the price id matching."""
+
+    for item in items:
+        if any([utils.lookup(item,
+                             'itemCategory',
+                             'categoryCode') != 'os',
+                utils.lookup(item,
+                             'softwareDescription',
+                             'referenceCode') != os]):
+            continue
+
+        for price in item['prices']:
+            if not _matches_location(price, location):
+                continue
+
+            return price['id']
+
+    raise SoftLayer.SoftLayerError("Could not find valid price for os: '%s'" %
+                                   os)
+
+
+def _get_port_speed_price_id(items, port_speed, no_public, location):
+    """Choose a valid price id for port speed."""
+
+    for item in items:
+        if utils.lookup(item,
+                        'itemCategory',
+                        'categoryCode') != 'port_speed':
+            continue
+
+        # Check for correct capacity and if the item matches private only
+        if any([int(utils.lookup(item, 'capacity')) != port_speed,
+                _is_private_port_speed_item(item) != no_public,
+                not _is_bonded(item)]):
+            continue
+
+        for price in item['prices']:
+            if not _matches_location(price, location):
+                continue
+
+            return price['id']
+
+    raise SoftLayer.SoftLayerError(
+        "Could not find valid price for port speed: '%s'" % port_speed)
+
+
+def _matches_billing(price, hourly):
+    """Return True if the price object is hourly and/or monthly."""
+    return any([hourly and price.get('hourlyRecurringFee') is not None,
+                not hourly and price.get('recurringFee') is not None])
+
+
+def _matches_location(price, location):
+    """Return True if the price object matches the location."""
+    # the price has no location restriction
+    if not price.get('locationGroupId'):
+        return True
+
+    # Check to see if any of the location groups match the location group
+    # of this price object
+    for group in location['location']['location']['priceGroups']:
+        if group['id'] == price['locationGroupId']:
+            return True
+
+    return False
+
+
+def _is_private_port_speed_item(item):
+    """Determine if the port speed item is private network only."""
+    for attribute in item['attributes']:
+        if attribute['attributeTypeKeyName'] == 'IS_PRIVATE_NETWORK_ONLY':
+            return True
+
+    return False
+
+
+def _is_bonded(item):
+    """Determine if the item refers to a bonded port."""
+    for attribute in item['attributes']:
+        if attribute['attributeTypeKeyName'] == 'NON_LACP':
+            return False
+
+    return True
+
+
+def _get_location(package, location):
+    """Get the longer key with a short location name."""
+    for region in package['regions']:
+        if region['location']['location']['name'] == location:
+            return region
+
+    raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'"
+                                   % location)
+
+
+def _get_preset_id(package, size):
+    """Get the preset id given the keyName of the preset."""
+    for preset in package['activePresets']:
+        if preset['keyName'] == size:
+            return preset['id']
+
+    raise SoftLayer.SoftLayerError("Could not find valid size for: '%s'"
+                                   % size)

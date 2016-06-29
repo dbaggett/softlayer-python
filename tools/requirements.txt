@@ -1,3 +1,5 @@
 requests
+click >= 5
 prettytable >= 0.7.0
-docopt == 0.6.1
+six >= 1.7.0
+prompt_toolkit

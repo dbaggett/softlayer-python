@@ -1,24 +1,53 @@
 """
     SoftLayer.utils
     ~~~~~~~~~~~~~~~
-    Utility function/classes
+    Utility function/classes.
 
     :license: MIT, see LICENSE for more details.
 """
+import datetime
 import re
 
-UUID_RE = re.compile('^[0-9a-f\-]{36}$', re.I)
-KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '*=', '^=', '$=', '_=', '!~']
+import six
+
+# pylint: disable=no-member, invalid-name
+
+UUID_RE = re.compile(r'^[0-9a-f\-]{36}$', re.I)
+KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '!~', '*=', '^=', '$=', '_=']
+
+configparser = six.moves.configparser
+string_types = six.string_types
+StringIO = six.StringIO
+xmlrpc_client = six.moves.xmlrpc_client
 
 
-# Code from http://stackoverflow.com/questions/11700798/python-accessing-values-nested-within-dictionaries  # NOQA
 def lookup(dic, key, *keys):
+    """A generic dictionary access helper.
+
+    This helps simplify code that uses heavily nested dictionaries. It will
+    return None if any of the keys in *keys do not exist.
+
+    ::
+
+        >>> lookup({'this': {'is': 'nested'}}, 'this', 'is')
+        nested
+
+        >>> lookup({}, 'this', 'is')
+        None
+
+    """
     if keys:
-        return lookup(dic.get(key, {}), *keys)
+        return lookup(dic.get(key, {}), keys[0], *keys[1:])
     return dic.get(key)
 
 
 class NestedDict(dict):
+    """This helps with accessing a heavily nested dictionary.
+
+    Dictionary where accessing keys that don't exist will return another
+    NestedDict object.
+
+    """
 
     def __getitem__(self, key):
         if key in self:
@@ -26,27 +55,28 @@ class NestedDict(dict):
         return self.setdefault(key, NestedDict())
 
     def to_dict(self):
-        d = {}
-        for k, v in self.items():
-            if isinstance(v, NestedDict):
-                d[k] = v.to_dict()
-            else:
-                d[k] = v
-        return d
+        """Converts a NestedDict instance into a real dictionary.
+
+        This is needed for places where strict type checking is done.
+        """
+        return {key: val.to_dict() if isinstance(val, NestedDict) else val
+                for key, val in self.items()}
 
 
 def query_filter(query):
-    """ Translate a query-style string to a 'filter'. Query can be the
-    following formats:
+    """Translate a query-style string to a 'filter'.
+
+    Query can be the following formats:
 
     Case Insensitive
-      'value'   Exact value match
-      'value*'  Begins with value
-      '*value'  Ends with value
-      '*value*' Contains value
+      'value' OR '*= value'    Contains
+      'value*' OR '^= value'   Begins with value
+      '*value' OR '$= value'   Ends with value
+      '*value*' OR '_= value'  Contains value
 
     Case Sensitive
-      '~ value'   Exact value match
+      '~ value'   Contains
+      '!~ value'  Does not contain
       '> value'   Greater than value
       '< value'   Less than value
       '>= value'  Greater than or equal to value
@@ -60,14 +90,14 @@ def query_filter(query):
     except ValueError:
         pass
 
-    if isinstance(query, basestring):
+    if isinstance(query, string_types):
         query = query.strip()
-        for op in KNOWN_OPERATIONS:
-            if query.startswith(op):
-                query = "%s %s" % (op, query[len(op):].strip())
+        for operation in KNOWN_OPERATIONS:
+            if query.startswith(operation):
+                query = "%s %s" % (operation, query[len(operation):].strip())
                 return {'operation': query}
         if query.startswith('*') and query.endswith('*'):
-            query = "~ %s" % query.strip('*')
+            query = "*= %s" % query.strip('*')
         elif query.startswith('*'):
             query = "$= %s" % query.strip('*')
         elif query.endswith('*'):
@@ -78,17 +108,40 @@ def query_filter(query):
     return {'operation': query}
 
 
+def query_filter_date(start, end):
+    """Query filters given start and end date.
+
+    :param start:YY-MM-DD
+    :param end: YY-MM-DD
+    """
+    sdate = datetime.datetime.strptime(start, "%Y-%m-%d")
+    edate = datetime.datetime.strptime(end, "%Y-%m-%d")
+    startdate = "%s/%s/%s" % (sdate.month, sdate.day, sdate.year)
+    enddate = "%s/%s/%s" % (edate.month, edate.day, edate.year)
+    return {
+        'operation': 'betweenDate',
+        'options': [
+            {'name': 'startDate', 'value': [startdate+' 0:0:0']},
+            {'name': 'endDate', 'value': [enddate+' 0:0:0']}
+        ]
+    }
+
+
 class IdentifierMixin(object):
-    """ This mixin provides an interface to provide multiple methods for
-        converting an 'indentifier' to an id """
+    """Mixin used to resolve ids from other names of objects.
+
+    This mixin provides an interface to provide multiple methods for
+    converting an 'indentifier' to an id
+
+    """
     resolvers = []
 
     def resolve_ids(self, identifier):
-        """ Takes a string and tries to resolve to a list of matching ids. What
-            exactly 'identifier' can be depends on the resolvers
+        """Takes a string and tries to resolve to a list of matching ids.
+
+        What exactly 'identifier' can be depends on the resolvers
 
         :param string identifier: identifying string
-
         :returns list:
         """
 
@@ -96,7 +149,7 @@ class IdentifierMixin(object):
 
 
 def resolve_ids(identifier, resolvers):
-    """ Resolves IDs given a list of functions
+    """Resolves IDs given a list of functions.
 
     :param string identifier: identifier string
     :param list resolvers: a list of functions
@@ -119,3 +172,16 @@ def resolve_ids(identifier, resolvers):
             return ids
 
     return []
+
+
+class UTC(datetime.tzinfo):
+    """UTC timezone."""
+
+    def utcoffset(self, _):
+        return datetime.timedelta(0)
+
+    def tzname(self, _):
+        return "UTC"
+
+    def dst(self, _):
+        return datetime.timedelta(0)

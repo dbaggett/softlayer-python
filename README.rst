@@ -1,24 +1,36 @@
 SoftLayer API Python Client
 ===========================
-.. image:: https://api.travis-ci.org/softlayer/softlayer-python.png
+.. image:: https://travis-ci.org/softlayer/softlayer-python.svg?branch=master
     :target: https://travis-ci.org/softlayer/softlayer-python
-        
-.. image:: https://landscape.io/github/softlayer/softlayer-python/master/landscape.png
+
+.. image:: https://landscape.io/github/softlayer/softlayer-python/master/landscape.svg
     :target: https://landscape.io/github/softlayer/softlayer-python/master
 
-.. image:: https://badge.fury.io/py/SoftLayer.png
+.. image:: https://badge.fury.io/py/SoftLayer.svg
     :target: http://badge.fury.io/py/SoftLayer
 
-SoftLayer API bindings for Python. For use with `SoftLayer's API <http://sldn.softlayer.com/reference/softlayerapi>`_.
+.. image:: https://coveralls.io/repos/softlayer/softlayer-python/badge.svg
+    :target: https://coveralls.io/r/softlayer/softlayer-python
 
-This library provides a simple interface to interact with SoftLayer's XML-RPC API and provides support for many of SoftLayer API's features like `object masks <http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayerAPI>`_ and includes a command-line interface that can be used to manage various SoftLayer services.
+
+This library provides a simple Python client to interact with `SoftLayer's
+XML-RPC API <http://developer.softlayer.com/reference/softlayerapi>`_.
+
+A command-line interface is also included and can be used to manage various
+SoftLayer products and services.
+
 
 Documentation
 -------------
-Documentation is available at https://softlayer-api-python-client.readthedocs.org
+Documentation for the Python client is available at
+http://softlayer.github.io/softlayer-python/.
 
-* API Client: https://softlayer-python.readthedocs.org/en/latest/api/client.html
-* Command-line Interface: https://softlayer-python.readthedocs.org/en/latest/cli.html
+Additional API documentation can be found on the SoftLayer Development Network:
+
+* `SoftLayer API reference
+  <http://developer.softlayer.com/reference/softlayerapi>`_
+* `Object mask information and examples
+  <http://developer.softlayer.com/article/Object-Masks>`_
 
 Installation
 ------------
@@ -32,25 +44,27 @@ Install via pip:
 Or you can install from source. Download source and run:
 
 .. code-block:: bash
-	
+
 	$ python setup.py install
 
 
-The most up to date version of this library can be found on the SoftLayer
-GitHub public repositories: http://github.com/softlayer. Please post to the
-SoftLayer forums http://forums.softlayer.com/ or open a support ticket in the
-SoftLayer customer portal if you have any questions regarding use of this
-library.
+The most up-to-date version of this library can be found on the SoftLayer
+GitHub public repositories at http://github.com/softlayer. Please post to Stack Overflow at https://stackoverflow.com/ or open a support ticket in the customer portal if you have any questions regarding use of this library. If you use Stack Overflow please tag your posts with “SoftLayer” so our team can easily find your post. 
+
+InsecurePlatformWarning Notice
+------------------------------
+This library relies on the `requests <http://docs.python-requests.org/>`_ library to make HTTP requests. On Python versions below Python 2.7.9, requests has started emitting a security warning (InsecurePlatformWarning) due to insecurities with creating SSL connections. To resolve this, upgrade to Python 2.7.9+ or follow the instructions here: http://stackoverflow.com/a/29099439.
 
 System Requirements
 -------------------
-* This library has been tested on Python 2.6, 2.7, 3.2 and 3.3.
-* A valid SoftLayer API username and key are required to call SoftLayer's API
-* A connection to SoftLayer's private network is required to connect to
-  SoftLayer’s private network API endpoints.
+* Python 2.7, 3.3 or higher.
+* A valid SoftLayer API username and key.
+* A connection to SoftLayer's private network is required to use
+  our private network API endpoints.
 
 
 Copyright
 ---------
-This software is Copyright (c) 2014 SoftLayer Technologies, Inc.
+This software is Copyright (c) 2016 SoftLayer Technologies, Inc.
+
 See the bundled LICENSE file for more information.

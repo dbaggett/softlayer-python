@@ -6,34 +6,29 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.utils import NestedDict
-from SoftLayer.CLI.environment import CLIRunnable
-from exceptions import CLIHalt, CLIAbort, ArgumentError
-from formatting import (
-    Table, KeyValueTable, FormattedItem, SequentialOutput, confirm,
-    no_going_back, mb_to_gb, gb, listing, blank, format_output,
-    active_txn, valid_response)
-from template import update_with_template_args, export_to_template
+import click
 
-__all__ = [
-    # Core/Misc
-    'CLIRunnable', 'NestedDict', 'FALSE_VALUES', 'resolve_id',
-    # Exceptions
-    'CLIAbort', 'CLIHalt', 'ArgumentError',
-    # Formatting
-    'Table', 'KeyValueTable', 'FormattedItem', 'SequentialOutput',
-    'valid_response', 'confirm', 'no_going_back', 'mb_to_gb', 'gb',
-    'listing', 'format_output', 'blank', 'active_txn',
-    # Template
-    'update_with_template_args', 'export_to_template',
-]
+from SoftLayer.CLI import exceptions
 
-FALSE_VALUES = ['0', 'false', 'FALSE', 'no', 'False']
+
+def multi_option(*param_decls, **attrs):
+    """modify help text and indicate option is permitted multiple times
+
+    :param param_decls:
+    :param attrs:
+    :return:
+
+    """
+    attrhelp = attrs.get('help', None)
+    if attrhelp is not None:
+        newhelp = attrhelp + " (multiple occurrence permitted)"
+        attrs['help'] = newhelp
+    attrs['multiple'] = True
+    return click.option(*param_decls, **attrs)
 
 
 def resolve_id(resolver, identifier, name='object'):
-    """ Resolves a single id using an id resolver function which returns a list
-        of ids.
+    """Resolves a single id using a resolver function.
 
     :param resolver: function that resolves ids. Should return None or a list
                      of ids.
@@ -44,10 +39,11 @@ def resolve_id(resolver, identifier, name='object'):
     ids = resolver(identifier)
 
     if len(ids) == 0:
-        raise CLIAbort("Error: Unable to find %s '%s'" % (name, identifier))
+        raise exceptions.CLIAbort("Error: Unable to find %s '%s'"
+                                  % (name, identifier))
 
     if len(ids) > 1:
-        raise CLIAbort(
+        raise exceptions.CLIAbort(
             "Error: Multiple %s found for '%s': %s" %
             (name, identifier, ', '.join([str(_id) for _id in ids])))
 

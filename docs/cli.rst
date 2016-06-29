@@ -3,22 +3,26 @@
 Command-line Interface
 ======================
 
-The SoftLayer command line interface is available via the `sl` command available in your `PATH`.  The `sl` command is a reference implementation of SoftLayer API bindings for python and how to efficiently make API calls. See the :ref:`usage-examples` section to see how to discover all of the functionality not fully documented here.
+The SoftLayer command line interface is available via the `sl` command
+available in your `PATH`.  The `sl` command is a reference implementation of
+SoftLayer API bindings for python and how to efficiently make API calls. See
+the :ref:`usage-examples` section to see how to discover all of the
+functionality not fully documented here.
 
 .. toctree::
    :maxdepth: 2
 
-   cli/cci
+   cli/vs
 
 
 .. _config_setup:
 
 Configuration Setup
 -------------------
-To update the configuration, you can use `sl config setup`.
+To update the configuration, you can use `slcli setup`.
 ::
 
-	$ sl config setup
+	$ slcli setup
 	Username []: username
 	API Key or Password []:
 	Endpoint (public|private|custom): public
@@ -29,12 +33,12 @@ To update the configuration, you can use `sl config setup`.
 	:      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
 	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3/                             :
 	:..............:..................................................................:
-	Are you sure you want to write settings to "/path/to/home/.softlayer"? [y/N]: y
+	Are you sure you want to write settings to "/home/me/.softlayer"? [y/N]: y
 
-To check the configuration, you can use `sl config show`.
+To check the configuration, you can use `slcli config show`.
 ::
 
-	$ sl config show
+	$ slcli config show
 	:..............:..................................................................:
 	:         Name : Value                                                            :
 	:..............:..................................................................:
@@ -54,101 +58,113 @@ To discover the available commands, simply type `sl`.
 ::
 
 	$ sl
-	usage: sl <module> [<args>...]
-	       sl help <module>
-	       sl help <module> <command>
-	       sl [-h | --help]
-	
-	SoftLayer Command-line Client
-	
-	The available modules are:
-	  cci       Manage, delete, order compute instances
-	  config    View and edit configuration for this tool
-	  dns       Manage DNS
-	  firewall  Firewall rule and security management
-	  hardware  View hardware details
-	  bmetal    Interact with bare metal instances
-	  network   Perform various network operations
-	  help      Show help
-	  iscsi     View iSCSI details
-	  image     Manages compute and flex images
-	  metadata  Get details about this machine. Also available with 'my' and 'meta'
-	  nas       View NAS details
-	  ssl       Manages SSL
+	Usage: slcli [OPTIONS] COMMAND [ARGS]...
 
-	See 'sl help <module>' for more information on a specific module.
+	  SoftLayer Command-line Client
 
-	To use most commands your SoftLayer username and api_key need to be configured.
-	The easiest way to do that is to use: 'sl config setup'
+	Options:
+	  --format [table|raw|json]  Output format
+	  -C, --config PATH          Config file location
+	  --debug [0|1|2|3]          Sets the debug noise level
+	  -v, --verbose              Sets the debug noise level
+	  --timings                  Time each API call and display after results
+	  --proxy TEXT               HTTP[S] proxy to be use to make API calls
+	  -y, --really               Confirm all prompt actions
+	  --fixtures                 Use fixtures instead of actually making API calls
+	  --version                  Show the version and exit.
+	  --help                     Show this message and exit.
 
-As you can see, there are a number of commands. To look at the list of subcommands for Cloud Compute Instances, type `sl <command>`. For example:
+	Commands:
+	  call-api   Call arbitrary API endpoints.
+	  cdn        Content Delivery Network.
+	  config     CLI configuration.
+	  dns        Domain Name System.
+	  firewall   Firewalls.
+	  globalip   Global IP addresses.
+	  image      Compute images.
+	  iscsi      iSCSI storage.
+	  loadbal    Load balancers.
+	  messaging  Message queue service.
+	  metadata   Find details about this machine.
+	  nas        Network Attached Storage.
+	  rwhois     Referral Whois.
+	  server     Hardware servers.
+	  snapshot   Snapshots.
+	  sshkey     SSH Keys.
+	  ssl        SSL Certificates.
+	  subnet     Network subnets.
+	  summary    Account summary.
+	  ticket     Support tickets.
+	  vlan       Network VLANs.
+	  vs         Virtual Servers.
+
+	  To use most commands your SoftLayer username and api_key need to be
+	  configured. The easiest way to do that is to use: 'slcli setup'
+
+As you can see, there are a number of commands/sections. To look at the list of
+subcommands for virtual servers type `slcli vs`. For example:
 ::
 
-	$ sl cci
-	usage: sl cci [<command>] [<args>...] [options]
+	$ slcli vs
+	Usage: slcli vs [OPTIONS] COMMAND [ARGS]...
 
-	Manage, delete, order compute instances
+	  Virtual Servers.
 
-	The available commands are:
-	  network         Manage network settings
-	  create          Order and create a CCI
-	                    (see `sl cci create-options` for choices)
-	  manage          Manage active CCI
-	  list            List CCI's on the account
-	  detail          Output details about a CCI
-	  dns             DNS related actions to a CCI
-	  cancel          Cancel a running CCI
-	  create-options  Output available available options when creating a CCI
-	  reload          Reload the OS on a CCI based on its current configuration
+	Options:
+	  --help  Show this message and exit.
 
-	Standard Options:
-	  -h --help  Show this screen
+	Commands:
+	  cancel          Cancel virtual servers.
+	  capture         Capture SoftLayer image.
+	  create          Order/create virtual servers.
+	  create-options  Virtual server order options.
+	  credentials     List virtual server credentials.
+	  detail          Get details for a virtual server.
+	  dns-sync        Sync DNS records.
+	  edit            Edit a virtual server's details.
+	  list            List virtual servers.
+	  network         Manage network settings.
+	  pause           Pauses an active virtual server.
+	  power_off       Power off an active virtual server.
+	  power_on        Power on a virtual server.
+	  ready           Check if a virtual server is ready.
+	  reboot          Reboot an active virtual server.
+	  reload          Reload operating system on a virtual server.
+	  rescue          Reboot into a rescue image.
+	  resume          Resumes a paused virtual server.
+	  upgrade         Upgrade a virtual server.
 
-Finally, we can make an actual call. Let's list out the CCIs on our account using `sl cci list`.
+Finally, we can make an actual call. Let's list out the virtual servers on our
+account by using `slcli vs list`.
 
 ::
 
-	$ sl cci list
+	$ slcli vs list
 	:.........:............:....................:.......:........:................:..............:....................:
 	:    id   : datacenter :       host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
 	:.........:............:....................:.......:........:................:..............:....................:
-	: 1234567 :   dal05    :  test.example.com  :   4   :   4G   :    12.34.56    :   65.43.21   :         -          :
+	: 1234567 :   sjc01    :  test.example.com  :   4   :   4G   :    12.34.56    :   65.43.21   :         -          :
 	:.........:............:....................:.......:........:................:..............:....................:
 
 Most commands will take in additional options/arguments. To see all available actions, use `--help`.
 ::
 
-	$ sl cci list --help
-	usage: sl cci list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
-	                   [options]
+	$ slcli vs list --help
+	Usage: slcli vs list [OPTIONS]
 
-	List CCIs
-
-	Examples:
-	    sl cci list --datacenter=dal05
-	    sl cci list --network=100 --cpu=2
-	    sl cci list --memory='>= 2048'
-	    sl cci list --tags=production,db
+	  List virtual servers.
 
 	Options:
-	  --sortby=ARG  Column to sort by. options: id, datacenter, host,
-	                Cores, memory, primary_ip, backend_ip
-
-	Filters:
-	  --hourly                 Show hourly instances
-	  --monthly                Show monthly instances
-	  -H --hostname=HOST       Host portion of the FQDN. example: server
-	  -D --domain=DOMAIN       Domain portion of the FQDN example: example.com
-	  -c --cpu=CPU             Number of CPU cores
-	  -m --memory=MEMORY       Memory in mebibytes (n * 1024)
-	  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
-	  -n MBPS, --network=MBPS  Network port speed in Mbps
-	  --tags=ARG               Only show instances that have one of these tags.
-	                           Comma-separated. (production,db)
-
-	For more on filters see 'sl help filters'
-
-	Standard Options:
-	  --format=ARG           Output format. [Options: table, raw] [Default: table]
-	  -C FILE --config=FILE  Config file location. [Default: ~/.softlayer]
-	  -h --help              Show this screen
+	  --sortby [guid|hostname|primary_ip|backend_ip|datacenter]
+	                                  Column to sort by
+	  -c, --cpu INTEGER               Number of CPU cores
+	  -D, --domain TEXT               Domain portion of the FQDN
+	  -d, --datacenter TEXT           Datacenter shortname
+	  -H, --hostname TEXT             Host portion of the FQDN
+	  -m, --memory INTEGER            Memory in mebibytes
+	  -n, --network TEXT              Network port speed in Mbps
+	  --hourly                        Show only hourly instances
+	  --monthly                       Show only monthly instances
+	  --tags TEXT                     Show instances that have one of these comma-
+	                                  separated tags
+	  --help                          Show this message and exit.

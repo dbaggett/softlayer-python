@@ -1,74 +1,44 @@
+from __future__ import print_function
 import sys
+from codecs import open
 import os
 
-try:
-    from setuptools import setup
-except ImportError:
-    print("Distribute is required for install:")
-    print("    http://python-distribute.org/distribute_setup.py")
-    sys.exit(1)
+from setuptools import setup, find_packages
 
-# Not supported for Python versions < 2.6
-if sys.version_info <= (2, 6):
-    print("Python 2.6 or greater is required.")
-    sys.exit(1)
-
-# Python 3 conversion
-extra = {}
-if sys.version_info >= (3,):
-    extra['use_2to3'] = True
-
-requires = [
-    'prettytable >= 0.7.0',
-    'docopt == 0.6.1',
-    'requests'
-]
-
-if sys.version_info < (2, 7):
-    requires.append('importlib')
-
-description = "A library for SoftLayer's API"
+DESCRIPTION = "A library for SoftLayer's API"
 
 if os.path.exists('README.rst'):
-    f = open('README.rst')
-    try:
-        long_description = f.read()
-    finally:
-        f.close()
+    with open('README.rst', 'r', 'utf-8') as readme_file:
+        LONG_DESCRIPTION = readme_file.read()
 else:
-    long_description = description
+    LONG_DESCRIPTION = DESCRIPTION
 
 setup(
     name='SoftLayer',
-    version='3.0.2',
-    description=description,
-    long_description=long_description,
+    version='5.1.0',
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=[
-        'SoftLayer',
-        'SoftLayer.CLI',
-        'SoftLayer.CLI.modules',
-        'SoftLayer.managers',
-        'SoftLayer.tests',
-        'SoftLayer.tests.CLI',
-        'SoftLayer.tests.CLI.modules',
-        'SoftLayer.tests.managers',
-        'SoftLayer.tests.fixtures',
-    ],
+    packages=find_packages(exclude=['tests']),
     license='MIT',
     zip_safe=False,
-    url='http://github.com/softlayer/softlayer-api-python-client',
+    url='http://github.com/softlayer/softlayer-python',
     entry_points={
         'console_scripts': [
-            'sl = SoftLayer.CLI.core:main',
+            'slcli = SoftLayer.CLI.core:main',
+            'sl = SoftLayer.CLI.deprecated:main',
         ],
     },
-    package_data={
-        'SoftLayer': ['tests/fixtures/*.conf'],
-    },
-    test_suite='nose.collector',
-    install_requires=requires,
+    install_requires=[
+        'six >= 1.7.0',
+        'prettytable >= 0.7.0',
+        'click >= 5',
+        'requests >= 2.7.0',
+        'prompt_toolkit >= 0.53',
+        'pygments >= 2.0.0',
+    ],
+    keywords=['softlayer', 'cloud'],
     classifiers=[
         'Environment :: Console',
         'Environment :: Web Environment',
@@ -78,12 +48,11 @@ setup(
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
-    **extra
 )

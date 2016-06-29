@@ -5,18 +5,27 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import time
+import warnings
 
-from consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
-from transports import make_xml_rpc_api_call
-from auth import TokenAuthentication
-from config import get_client_settings
+from SoftLayer import auth as slauth
+from SoftLayer import config
+from SoftLayer import consts
+from SoftLayer import transports
+
+# pylint: disable=invalid-name
 
 
-__all__ = ['Client', 'TimedClient', 'API_PUBLIC_ENDPOINT',
-           'API_PRIVATE_ENDPOINT']
+API_PUBLIC_ENDPOINT = consts.API_PUBLIC_ENDPOINT
+API_PRIVATE_ENDPOINT = consts.API_PRIVATE_ENDPOINT
+__all__ = [
+    'create_client_from_env',
+    'Client',
+    'BaseClient',
+    'API_PUBLIC_ENDPOINT',
+    'API_PRIVATE_ENDPOINT',
+]
 
-VALID_CALL_ARGS = set([
+VALID_CALL_ARGS = set((
     'id',
     'mask',
     'filter',
@@ -25,11 +34,22 @@ VALID_CALL_ARGS = set([
     'raw_headers',
     'limit',
     'offset',
-])
+))
 
 
-class Client(object):
-    """ A SoftLayer API client.
+def create_client_from_env(username=None,
+                           api_key=None,
+                           endpoint_url=None,
+                           timeout=None,
+                           auth=None,
+                           config_file=None,
+                           proxy=None,
+                           user_agent=None,
+                           transport=None):
+    """Creates a SoftLayer API client using your environment.
+
+    Settings are loaded via keyword arguments, environemtal variables and
+    config file.
 
     :param username: an optional API username if you wish to bypass the
         package's built-in username
@@ -38,44 +58,90 @@ class Client(object):
     :param endpoint_url: the API endpoint base URL you wish to connect to.
         Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer's private
         network.
+    :param proxy: proxy to be used to make API calls
     :param integer timeout: timeout for API requests
     :param auth: an object which responds to get_headers() to be inserted into
         the xml-rpc headers. Example: `BasicAuthentication`
     :param config_file: A path to a configuration file used to load settings
+    :param user_agent: an optional User Agent to report when making API
+        calls if you wish to bypass the packages built in User Agent string
+    :param transport: An object that's callable with this signature:
+                      transport(SoftLayer.transports.Request)
 
     Usage:
 
         >>> import SoftLayer
-        >>> client = SoftLayer.Client(username="username", api_key="api_key")
-        >>> resp = client['Account'].getObject()
+        >>> client = SoftLayer.create_client_from_env()
+        >>> resp = client.call('Account', 'getObject')
         >>> resp['companyName']
         'Your Company'
 
     """
+    settings = config.get_client_settings(username=username,
+                                          api_key=api_key,
+                                          endpoint_url=endpoint_url,
+                                          timeout=timeout,
+                                          proxy=proxy,
+                                          config_file=config_file)
+
+    # Default the transport to use XMLRPC
+    if transport is None:
+        transport = transports.XmlRpcTransport(
+            endpoint_url=settings.get('endpoint_url'),
+            proxy=settings.get('proxy'),
+            timeout=settings.get('timeout'),
+            user_agent=user_agent,
+        )
+
+    # If we have enough information to make an auth driver, let's do it
+    if auth is None and settings.get('username') and settings.get('api_key'):
+        # NOTE(kmcdonald): some transports mask other transports, so this is
+        # a way to find the 'real' one
+        real_transport = getattr(transport, 'transport', transport)
+
+        if isinstance(real_transport, transports.XmlRpcTransport):
+            auth = slauth.BasicAuthentication(
+                settings.get('username'),
+                settings.get('api_key'),
+            )
+
+        elif isinstance(real_transport, transports.RestTransport):
+            auth = slauth.BasicHTTPAuthentication(
+                settings.get('username'),
+                settings.get('api_key'),
+            )
+
+    return BaseClient(auth=auth, transport=transport)
+
+
+def Client(**kwargs):
+    """Get a SoftLayer API Client using environmental settings.
+
+    Deprecated in favor of create_client_from_env()
+    """
+    warnings.warn("use SoftLayer.create_client_from_env() instead",
+                  DeprecationWarning)
+    return create_client_from_env(**kwargs)
+
+
+class BaseClient(object):
+    """Base SoftLayer API client.
+
+    :param auth: auth driver that looks like SoftLayer.auth.AuthenticationBase
+    :param transport: An object that's callable with this signature:
+                      transport(SoftLayer.transports.Request)
+    """
+
     _prefix = "SoftLayer_"
 
-    def __init__(self, username=None, api_key=None, endpoint_url=None,
-                 timeout=None, auth=None, config_file=None):
-
-        settings = get_client_settings(username=username,
-                                       api_key=api_key,
-                                       endpoint_url=endpoint_url,
-                                       timeout=timeout,
-                                       auth=auth,
-                                       config_file=config_file)
-        self.auth = settings.get('auth')
-        self.endpoint_url = (
-            settings.get('endpoint_url') or API_PUBLIC_ENDPOINT).rstrip('/')
-        self.timeout = None
-        self.last_calls = []
-        if settings.get('timeout'):
-            self.timeout = float(settings.get('timeout'))
+    def __init__(self, auth=None, transport=None):
+        self.auth = auth
+        self.transport = transport
 
     def authenticate_with_password(self, username, password,
                                    security_question_id=None,
                                    security_question_answer=None):
-        """ Performs Username/Password Authentication and gives back an auth
-            handler to use to create a client that uses token-based auth.
+        """Performs Username/Password Authentication
 
         :param string username: your SoftLayer username
         :param string password: your SoftLayer password
@@ -85,22 +151,22 @@ class Client(object):
 
         """
         self.auth = None
-        res = self['User_Customer'].getPortalLoginToken(
-            username,
-            password,
-            security_question_id,
-            security_question_answer)
-        self.auth = TokenAuthentication(res['userId'], res['hash'])
-        return (res['userId'], res['hash'])
+        res = self.call('User_Customer', 'getPortalLoginToken',
+                        username,
+                        password,
+                        security_question_id,
+                        security_question_answer)
+        self.auth = slauth.TokenAuthentication(res['userId'], res['hash'])
+        return res['userId'], res['hash']
 
     def __getitem__(self, name):
-        """ Get a SoftLayer Service.
+        """Get a SoftLayer Service.
 
         :param name: The name of the service. E.G. Account
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> client['Account']
             <Service: Account>
 
@@ -108,20 +174,20 @@ class Client(object):
         return Service(self, name)
 
     def call(self, service, method, *args, **kwargs):
-        """ Make a SoftLayer API call
+        """Make a SoftLayer API call
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param \*args: same optional arguments that ``Service.call`` takes
-        :param \*\*kwargs: same optional keyword arguments that
+        :param \\*args: same optional arguments that ``Service.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that
                            ``Service.call`` takes
 
         :param service: the name of the SoftLayer API service
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
-            >>> client['Account'].getVirtualGuests(mask="id", limit=10)
+            >>> client = SoftLayer.create_client_from_env()
+            >>> client.call('Account', 'getVirtualGuests', mask="id", limit=10)
             [...]
 
         """
@@ -133,68 +199,60 @@ class Client(object):
             raise TypeError(
                 'Invalid keyword arguments: %s' % ','.join(invalid_kwargs))
 
-        if not service.startswith(self._prefix):
+        if self._prefix and not service.startswith(self._prefix):
             service = self._prefix + service
 
-        objectid = kwargs.get('id')
-        objectmask = kwargs.get('mask')
-        objectfilter = kwargs.get('filter')
-        headers = kwargs.get('headers', {})
-        compress = kwargs.get('compress', True)
-        raw_headers = kwargs.get('raw_headers')
-        limit = kwargs.get('limit')
-        offset = kwargs.get('offset', 0)
+        http_headers = {'Accept': '*/*'}
+
+        if kwargs.get('compress', True):
+            http_headers['Accept-Encoding'] = 'gzip, deflate, compress'
+        else:
+            http_headers['Accept-Encoding'] = None
+
+        if kwargs.get('raw_headers'):
+            http_headers.update(kwargs.get('raw_headers'))
+
+        request = transports.Request()
+        request.service = service
+        request.method = method
+        request.args = args
+        request.transport_headers = http_headers
+        request.identifier = kwargs.get('id')
+        request.mask = kwargs.get('mask')
+        request.filter = kwargs.get('filter')
+        request.limit = kwargs.get('limit')
+        request.offset = kwargs.get('offset')
 
         if self.auth:
-            headers.update(self.auth.get_headers())
+            extra_headers = self.auth.get_headers()
+            if extra_headers:
+                warnings.warn("auth.get_headers() is deprecated and will be "
+                              "removed in the next major version",
+                              DeprecationWarning)
+                request.headers.update(extra_headers)
 
-        if objectid is not None:
-            headers[service + 'InitParameters'] = {'id': objectid}
+            request = self.auth.get_request(request)
 
-        if objectmask is not None:
-            headers.update(self.__format_object_mask(objectmask, service))
-
-        if objectfilter is not None:
-            headers['%sObjectFilter' % service] = objectfilter
-
-        if limit:
-            headers['resultLimit'] = {
-                'limit': limit,
-                'offset': offset,
-            }
-
-        http_headers = {
-            'User-Agent': USER_AGENT,
-            'Content-Type': 'application/xml',
-        }
-
-        if compress:
-            http_headers['Accept'] = '*/*'
-            http_headers['Accept-Encoding'] = 'gzip, deflate, compress'
-
-        if raw_headers:
-            http_headers.update(raw_headers)
-
-        uri = '/'.join([self.endpoint_url, service])
-        return make_xml_rpc_api_call(uri, method, args,
-                                     headers=headers,
-                                     http_headers=http_headers,
-                                     timeout=self.timeout)
+        request.headers.update(kwargs.get('headers', {}))
+        return self.transport(request)
 
     __call__ = call
 
-    def iter_call(self, service, method,
-                  chunk=100, limit=None, offset=0, *args, **kwargs):
-        """ A generator that deals with paginating through results.
+    def iter_call(self, service, method, *args, **kwargs):
+        """A generator that deals with paginating through results.
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param integer chunk: result size for each API call
-        :param \*args: same optional arguments that ``Service.call`` takes
-        :param \*\*kwargs: same optional keyword arguments that
+        :param integer chunk: result size for each API call (defaults to 100)
+        :param \\*args: same optional arguments that ``Service.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that
                            ``Service.call`` takes
 
         """
+        chunk = kwargs.pop('chunk', 100)
+        limit = kwargs.pop('limit', None)
+        offset = kwargs.pop('offset', 0)
+
         if chunk <= 0:
             raise AttributeError("Chunk size should be greater than zero.")
 
@@ -212,6 +270,7 @@ class Client(object):
                 # Don't over-fetch past the given limit
                 if chunk + result_count > limit:
                     chunk = limit - result_count
+
             results = self.call(service, method,
                                 offset=offset, limit=chunk, *args, **kwargs)
 
@@ -234,28 +293,8 @@ class Client(object):
             if len(results) < chunk:
                 break
 
-    def __format_object_mask(self, objectmask, service):
-        """ Format new and old style object masks into proper headers.
-
-        :param objectmask: a string- or dict-based object mask
-        :param service: a SoftLayer API service name
-
-        """
-        if isinstance(objectmask, dict):
-            mheader = '%sObjectMask' % service
-        else:
-            mheader = self._prefix + 'ObjectMask'
-
-            objectmask = objectmask.strip()
-            if not objectmask.startswith('mask') \
-                    and not objectmask.startswith('['):
-                objectmask = "mask[%s]" % objectmask
-
-        return {mheader: {'mask': objectmask}}
-
     def __repr__(self):
-        return "<Client: endpoint=%s, user=%r>" \
-            % (self.endpoint_url, self.auth)
+        return "Client(transport=%r, auth=%r)" % (self.transport, self.auth)
 
     __str__ = __repr__
 
@@ -263,46 +302,22 @@ class Client(object):
         return 0
 
 
-class TimedClient(Client):
-    """ Subclass of Client()
-
-    Using this class will time every call to the API and store it in an
-    internal list. This will have a slight impact on your client's memory
-    usage and performance. You should only use this for debugging.
-    """
-    last_calls = []
-
-    def call(self, service, method, *args, **kwargs):
-        """ See Client.call for documentation. """
-        start_time = time.time()
-        result = super(TimedClient, self).call(service, method, *args,
-                                               **kwargs)
-        end_time = time.time()
-        diff = end_time - start_time
-        self.last_calls.append((service + '.' + method, start_time, diff))
-        return result
-
-    def get_last_calls(self):
-        """ Retrieves the last_calls property.
-
-        This property will contain a list of tuples in the form
-        ('SERVICE.METHOD', initiated_utc_timestamp, execution_time)
-        """
-        last_calls = self.last_calls
-        self.last_calls = []
-        return last_calls
-
-
 class Service(object):
+    """A SoftLayer Service.
+
+        :param client: A SoftLayer.API.Client instance
+        :param name str: The service name
+
+    """
     def __init__(self, client, name):
         self.client = client
         self.name = name
 
     def call(self, name, *args, **kwargs):
-        """ Make a SoftLayer API call
+        """Make a SoftLayer API call.
 
         :param method: the method to call on the service
-        :param \*args: (optional) arguments for the remote call
+        :param \\*args: (optional) arguments for the remote call
         :param id: (optional) id for the resource
         :param mask: (optional) object mask
         :param dict filter: (optional) filter dict
@@ -313,10 +328,12 @@ class Service(object):
         :param int offset: (optional) offset results by this many
         :param boolean iter: (optional) if True, returns a generator with the
                              results
+        :param bool verify: verify SSL cert
+        :param cert: client certificate path
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
             [...]
 
@@ -326,18 +343,18 @@ class Service(object):
     __call__ = call
 
     def iter_call(self, name, *args, **kwargs):
-        """ A generator that deals with paginating through results.
+        """A generator that deals with paginating through results.
 
         :param method: the method to call on the service
         :param integer chunk: result size for each API call
-        :param \*args: same optional arguments that ``Service.call`` takes
-        :param \*\*kwargs: same optional keyword arguments that
+        :param \\*args: same optional arguments that ``Service.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that
                            ``Service.call`` takes
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
-            >>> gen = client['Account'].getVirtualGuests(iter=True)
+            >>> client = SoftLayer.create_client_from_env()
+            >>> gen = client.call('Account', 'getVirtualGuests', iter=True)
             >>> for virtual_guest in gen:
             ...     virtual_guest['id']
             ...
@@ -352,6 +369,7 @@ class Service(object):
             raise AttributeError("'Obj' object has no attribute '%s'" % name)
 
         def call_handler(*args, **kwargs):
+            " Handler that actually makes the API call "
             return self(name, *args, **kwargs)
         return call_handler
 

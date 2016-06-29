@@ -6,10 +6,13 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
+
 import requests.auth
 
-from SoftLayer.consts import USER_AGENT
-from SoftLayer.exceptions import Unauthenticated, SoftLayerError
+from SoftLayer import consts
+from SoftLayer import exceptions
+# pylint: disable=no-self-use
+
 
 ENDPOINTS = {
     "dal05": {
@@ -20,7 +23,7 @@ ENDPOINTS = {
 
 
 class QueueAuth(requests.auth.AuthBase):
-    """ Message Queue authentication for requests
+    """Message Queue authentication for requests.
 
     :param endpoint: endpoint URL
     :param username: SoftLayer username
@@ -34,7 +37,7 @@ class QueueAuth(requests.auth.AuthBase):
         self.auth_token = auth_token
 
     def auth(self):
-        """ Do Authentication """
+        """Authenticate."""
         headers = {
             'X-Auth-User': self.username,
             'X-Auth-Key': self.api_key
@@ -43,53 +46,54 @@ class QueueAuth(requests.auth.AuthBase):
         if resp.ok:
             self.auth_token = resp.headers['X-Auth-Token']
         else:
-            raise Unauthenticated("Error while authenticating: %s"
-                                  % resp.status_code)
+            raise exceptions.Unauthenticated("Error while authenticating: %s"
+                                             % resp.status_code)
 
-    def handle_error(self, r, **_):
-        """ Handle errors """
-        r.request.deregister_hook('response', self.handle_error)
-        if r.status_code == 503:
-            r.connection.send(r.request)
-        elif r.status_code == 401:
+    def handle_error(self, resp, **_):
+        """Handle errors."""
+        resp.request.deregister_hook('response', self.handle_error)
+        if resp.status_code == 503:
+            resp.connection.send(resp.request)
+        elif resp.status_code == 401:
             self.auth()
-            r.request.headers['X-Auth-Token'] = self.auth_token
-            r.connection.send(r.request)
+            resp.request.headers['X-Auth-Token'] = self.auth_token
+            resp.connection.send(resp.request)
 
-    def __call__(self, r):
-        """ Attach auth token to the request. Do authentication if an auth
-            token isn't available
+    def __call__(self, resp):
+        """Attach auth token to the request.
+
+        Do authentication if an auth token isn't available
         """
         if not self.auth_token:
             self.auth()
-        r.register_hook('response', self.handle_error)
-        r.headers['X-Auth-Token'] = self.auth_token
-        return r
+        resp.register_hook('response', self.handle_error)
+        resp.headers['X-Auth-Token'] = self.auth_token
+        return resp
 
 
 class MessagingManager(object):
-    """ Manage SoftLayer Message Queue """
+    """Manage SoftLayer Message Queue."""
     def __init__(self, client):
         self.client = client
 
     def list_accounts(self, **kwargs):
-        """ List message queue accounts
+        """List message queue accounts.
 
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
         if 'mask' not in kwargs:
-            items = set([
+            items = [
                 'id',
                 'name',
                 'status',
                 'nodes',
-            ])
+            ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
         return self.client['Account'].getMessageQueueAccounts(**kwargs)
 
     def get_endpoint(self, datacenter=None, network=None):
-        """ Get a message queue endpoint based on datacenter/network type
+        """Get a message queue endpoint based on datacenter/network type.
 
         :param datacenter: datacenter code
         :param network: network ('public' or 'private')
@@ -106,20 +110,20 @@ class MessagingManager(object):
                             % (datacenter, network))
 
     def get_endpoints(self):
-        """ Get all known message queue endpoints """
+        """Get all known message queue endpoints."""
         return ENDPOINTS
 
     def get_connection(self, account_id, datacenter=None, network=None):
-        """ Get connection to Message Queue Service
+        """Get connection to Message Queue Service.
 
         :param account_id: Message Queue Account id
         :param datacenter: Datacenter code
         :param network: network ('public' or 'private')
         """
-        if not self.client.auth \
-                or not getattr(self.client.auth, 'username', None) \
-                or not getattr(self.client.auth, 'api_key', None):
-            raise SoftLayerError(
+        if any([not self.client.auth,
+                not getattr(self.client.auth, 'username', None),
+                not getattr(self.client.auth, 'api_key', None)]):
+            raise exceptions.SoftLayerError(
                 'Client instance auth must be BasicAuthentication.')
 
         client = MessagingConnection(
@@ -129,14 +133,15 @@ class MessagingManager(object):
         return client
 
     def ping(self, datacenter=None, network=None):
-        r = requests.get('%s/v1/ping' %
-                         self.get_endpoint(datacenter, network))
-        r.raise_for_status()
+        """Ping a message queue endpoint."""
+        resp = requests.get('%s/v1/ping' %
+                            self.get_endpoint(datacenter, network))
+        resp.raise_for_status()
         return True
 
 
 class MessagingConnection(object):
-    """ Message Queue Service Connection
+    """Message Queue Service Connection.
 
     :param account_id: Message Queue Account id
     :param endpoint: Endpoint URL
@@ -147,27 +152,32 @@ class MessagingConnection(object):
         self.auth = None
 
     def _make_request(self, method, path, **kwargs):
-        """ Make request. Generally not called directly
+        """Make request. Generally not called directly.
 
         :param method: HTTP Method
         :param path: resource Path
-        :param dict \*\*kwargs: extra request arguments
+        :param dict \\*\\*kwargs: extra request arguments
         """
         headers = {
             'Content-Type': 'application/json',
-            'User-Agent': USER_AGENT,
+            'User-Agent': consts.USER_AGENT,
         }
         headers.update(kwargs.get('headers', {}))
         kwargs['headers'] = headers
         kwargs['auth'] = self.auth
 
         url = '/'.join((self.endpoint, 'v1', self.account_id, path))
-        r = requests.request(method, url, **kwargs)
-        r.raise_for_status()
-        return r
+        resp = requests.request(method, url, **kwargs)
+        try:
+            resp.raise_for_status()
+        except requests.HTTPError as ex:
+            content = json.loads(ex.response.content)
+            raise exceptions.SoftLayerAPIError(ex.response.status_code,
+                                               content['message'])
+        return resp
 
     def authenticate(self, username, api_key, auth_token=None):
-        """ Make request. Generally not called directly
+        """Authenticate this connection using the given credentials.
 
         :param username: SoftLayer username
         :param api_key: SoftLayer API Key
@@ -181,56 +191,56 @@ class MessagingConnection(object):
         self.auth = auth
 
     def stats(self, period='hour'):
-        """ Get account stats
+        """Get account stats.
 
         :param period: 'hour', 'day', 'week', 'month'
         """
-        r = self._make_request('get', 'stats/%s' % period)
-        return json.loads(r.content)
+        resp = self._make_request('get', 'stats/%s' % period)
+        return resp.json()
 
     # QUEUE METHODS
 
     def get_queues(self, tags=None):
-        """ Get listing of queues
+        """Get listing of queues.
 
         :param list tags: (optional) list of tags to filter by
         """
         params = {}
         if tags:
             params['tags'] = ','.join(tags)
-        r = self._make_request('get', 'queues', params=params)
-        return json.loads(r.content)
+        resp = self._make_request('get', 'queues', params=params)
+        return resp.json()
 
     def create_queue(self, queue_name, **kwargs):
-        """ Create Queue
+        """Create Queue.
 
         :param queue_name: Queue Name
-        :param dict \*\*kwargs: queue options
+        :param dict \\*\\*kwargs: queue options
         """
         queue = {}
         queue.update(kwargs)
         data = json.dumps(queue)
-        r = self._make_request('put', 'queues/%s' % queue_name, data=data)
-        return json.loads(r.content)
+        resp = self._make_request('put', 'queues/%s' % queue_name, data=data)
+        return resp.json()
 
     def modify_queue(self, queue_name, **kwargs):
-        """ Modify Queue
+        """Modify Queue.
 
         :param queue_name: Queue Name
-        :param dict \*\*kwargs: queue options
+        :param dict \\*\\*kwargs: queue options
         """
         return self.create_queue(queue_name, **kwargs)
 
     def get_queue(self, queue_name):
-        """ Get queue details
+        """Get queue details.
 
         :param queue_name: Queue Name
         """
-        r = self._make_request('get', 'queues/%s' % queue_name)
-        return json.loads(r.content)
+        resp = self._make_request('get', 'queues/%s' % queue_name)
+        return resp.json()
 
     def delete_queue(self, queue_name, force=False):
-        """ Delete Queue
+        """Delete Queue.
 
         :param queue_name: Queue Name
         :param force: (optional) Force queue to be deleted even if there
@@ -243,30 +253,43 @@ class MessagingConnection(object):
         return True
 
     def push_queue_message(self, queue_name, body, **kwargs):
-        """ Create Queue Message
+        """Create Queue Message.
 
         :param queue_name: Queue Name
         :param body: Message body
-        :param dict \*\*kwargs: Message options
+        :param dict \\*\\*kwargs: Message options
         """
         message = {'body': body}
         message.update(kwargs)
-        r = self._make_request('post', 'queues/%s/messages' % queue_name,
-                               data=json.dumps(message))
-        return json.loads(r.content)
+        resp = self._make_request('post', 'queues/%s/messages' % queue_name,
+                                  data=json.dumps(message))
+        return resp.json()
 
-    def pop_message(self, queue_name, count=1):
-        """ Pop message from a queue
+    def pop_messages(self, queue_name, count=1):
+        """Pop messages from a queue.
 
         :param queue_name: Queue Name
         :param count: (optional) number of messages to retrieve
         """
-        r = self._make_request('get', 'queues/%s/messages' % queue_name,
-                               params={'batch': count})
-        return json.loads(r.content)
+        resp = self._make_request('get', 'queues/%s/messages' % queue_name,
+                                  params={'batch': count})
+        return resp.json()
+
+    def pop_message(self, queue_name):
+        """Pop a single message from a queue.
+
+        If no messages are returned this returns None
+
+        :param queue_name: Queue Name
+        """
+        messages = self.pop_messages(queue_name, count=1)
+        if messages['item_count'] > 0:
+            return messages['items'][0]
+        else:
+            return None
 
     def delete_message(self, queue_name, message_id):
-        """ Delete a message
+        """Delete a message.
 
         :param queue_name: Queue Name
         :param message_id: Message id
@@ -278,44 +301,44 @@ class MessagingConnection(object):
     # TOPIC METHODS
 
     def get_topics(self, tags=None):
-        """ Get listing of topics
+        """Get listing of topics.
 
         :param list tags: (optional) list of tags to filter by
         """
         params = {}
         if tags:
             params['tags'] = ','.join(tags)
-        r = self._make_request('get', 'topics', params=params)
-        return json.loads(r.content)
+        resp = self._make_request('get', 'topics', params=params)
+        return resp.json()
 
     def create_topic(self, topic_name, **kwargs):
-        """ Create Topic
+        """Create Topic.
 
         :param topic_name: Topic Name
-        :param dict \*\*kwargs: Topic options
+        :param dict \\*\\*kwargs: Topic options
         """
         data = json.dumps(kwargs)
-        r = self._make_request('put', 'topics/%s' % topic_name, data=data)
-        return json.loads(r.content)
+        resp = self._make_request('put', 'topics/%s' % topic_name, data=data)
+        return resp.json()
 
     def modify_topic(self, topic_name, **kwargs):
-        """ Modify Topic
+        """Modify Topic.
 
         :param topic_name: Topic Name
-        :param dict \*\*kwargs: Topic options
+        :param dict \\*\\*kwargs: Topic options
         """
         return self.create_topic(topic_name, **kwargs)
 
     def get_topic(self, topic_name):
-        """ Get topic details
+        """Get topic details.
 
         :param topic_name: Topic Name
         """
-        r = self._make_request('get', 'topics/%s' % topic_name)
-        return json.loads(r.content)
+        resp = self._make_request('get', 'topics/%s' % topic_name)
+        return resp.json()
 
     def delete_topic(self, topic_name, force=False):
-        """ Delete Topic
+        """Delete Topic.
 
         :param topic_name: Topic Name
         :param force: (optional) Force topic to be deleted even if there
@@ -328,45 +351,46 @@ class MessagingConnection(object):
         return True
 
     def push_topic_message(self, topic_name, body, **kwargs):
-        """ Create Topic Message
+        """Create Topic Message.
 
         :param topic_name: Topic Name
         :param body: Message body
-        :param dict \*\*kwargs: Topic message options
+        :param dict \\*\\*kwargs: Topic message options
         """
         message = {'body': body}
         message.update(kwargs)
-        r = self._make_request('post', 'topics/%s/messages' % topic_name,
-                               data=json.dumps(message))
-        return json.loads(r.content)
+        resp = self._make_request('post', 'topics/%s/messages' % topic_name,
+                                  data=json.dumps(message))
+        return resp.json()
 
     def get_subscriptions(self, topic_name):
-        """ Listing of subscriptions on a topic
+        """Listing of subscriptions on a topic.
 
         :param topic_name: Topic Name
         """
-        r = self._make_request('get', 'topics/%s/subscriptions' % topic_name)
-        return json.loads(r.content)
+        resp = self._make_request('get',
+                                  'topics/%s/subscriptions' % topic_name)
+        return resp.json()
 
     def create_subscription(self, topic_name, subscription_type, **kwargs):
-        """ Create Subscription
+        """Create Subscription.
 
         :param topic_name: Topic Name
         :param subscription_type: type ('queue' or 'http')
-        :param dict \*\*kwargs: Subscription options
+        :param dict \\*\\*kwargs: Subscription options
         """
-        r = self._make_request(
+        resp = self._make_request(
             'post', 'topics/%s/subscriptions' % topic_name,
             data=json.dumps({
                 'endpoint_type': subscription_type, 'endpoint': kwargs}))
-        return json.loads(r.content)
+        return resp.json()
 
     def delete_subscription(self, topic_name, subscription_id):
-        """ Delete a subscription
+        """Delete a subscription.
 
         :param topic_name: Topic Name
         :param subscription_id: Subscription id
         """
         self._make_request('delete', 'topics/%s/subscriptions/%s' %
-                          (topic_name, subscription_id))
+                           (topic_name, subscription_id))
         return True

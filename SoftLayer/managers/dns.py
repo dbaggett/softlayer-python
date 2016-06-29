@@ -5,48 +5,41 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from time import strftime
+import time
 
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+from SoftLayer import utils
 
 
-class DNSManager(IdentifierMixin, object):
-    """ DNSManager initialization.
+class DNSManager(utils.IdentifierMixin, object):
+    """Domain Name System manager.
 
     :param SoftLayer.API.Client client: the client instance
 
     """
 
     def __init__(self, client):
-        #: A valid `SoftLayer.API.Client` object that will be used for all
-        #: actions.
         self.client = client
-        #: Reference to the SoftLayer_Dns_Domain API object.
         self.service = self.client['Dns_Domain']
-        #: Reference to the SoftLayer.Dns_Domain_ResourceRecord
-        #: API object.
         self.record = self.client['Dns_Domain_ResourceRecord']
-        #: A list of resolver functions. Used primarily by the CLI to provide
-        #: a variety of methods for uniquely identifying an object such as zone
-        #: name.
         self.resolvers = [self._get_zone_id_from_name]
 
     def _get_zone_id_from_name(self, name):
+        """Return zone ID based on a zone."""
         results = self.client['Account'].getDomains(
-            filter={"domains": {"name": query_filter(name)}})
+            filter={"domains": {"name": utils.query_filter(name)}})
         return [x['id'] for x in results]
 
     def list_zones(self, **kwargs):
-        """ Retrieve a list of all DNS zones.
+        """Retrieve a list of all DNS zones.
 
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         :returns: A list of dictionaries representing the matching zones.
 
         """
         return self.client['Account'].getDomains(**kwargs)
 
     def get_zone(self, zone_id, records=True):
-        """ Get a zone and its records.
+        """Get a zone and its records.
 
         :param zone: the zone name
         :returns: A dictionary containing a large amount of information about
@@ -59,7 +52,7 @@ class DNSManager(IdentifierMixin, object):
         return self.service.getObject(id=zone_id, mask=mask)
 
     def create_zone(self, zone, serial=None):
-        """ Create a zone for the specified zone.
+        """Create a zone for the specified zone.
 
         :param zone: the zone name to create
         :param serial: serial value on the zone (default: strftime(%Y%m%d01))
@@ -67,11 +60,11 @@ class DNSManager(IdentifierMixin, object):
         """
         return self.service.createObject({
             'name': zone,
-            'serial': serial or strftime('%Y%m%d01'),
+            'serial': serial or time.strftime('%Y%m%d01'),
             "resourceRecords": {}})
 
     def delete_zone(self, zone_id):
-        """ Delete a zone by its ID.
+        """Delete a zone by its ID.
 
         :param integer zone_id: the zone ID to delete
 
@@ -79,9 +72,10 @@ class DNSManager(IdentifierMixin, object):
         return self.service.deleteObject(id=zone_id)
 
     def edit_zone(self, zone):
-        """ Update an existing zone with the options provided. The provided
-        dict must include an 'id' key and value corresponding to the zone that
-        should be updated.
+        """Update an existing zone with the options provided.
+
+        The provided dict must include an 'id' key and value corresponding
+        to the zone that should be updated.
 
         :param dict zone: the zone to update
 
@@ -89,7 +83,7 @@ class DNSManager(IdentifierMixin, object):
         self.service.editObject(zone)
 
     def create_record(self, zone_id, record, record_type, data, ttl=60):
-        """ Create a resource record on a domain.
+        """Create a resource record on a domain.
 
         :param integer id: the zone's ID
         :param record: the name of the record to add
@@ -98,7 +92,7 @@ class DNSManager(IdentifierMixin, object):
         :param integer ttl: the TTL or time-to-live value (default: 60)
 
         """
-        self.record.createObject({
+        return self.record.createObject({
             'domainId': zone_id,
             'ttl': ttl,
             'host': record,
@@ -106,39 +100,46 @@ class DNSManager(IdentifierMixin, object):
             'data': data})
 
     def delete_record(self, record_id):
-        """ Delete a resource record by its ID.
+        """Delete a resource record by its ID.
 
         :param integer id: the record's ID
 
         """
         self.record.deleteObject(id=record_id)
 
+    def get_record(self, record_id):
+        """Get a DNS record.
+
+        :param integer id: the record's ID
+        """
+        return self.record.getObject(id=record_id)
+
     def get_records(self, zone_id, ttl=None, data=None, host=None,
                     record_type=None):
-        """ List, and optionally filter, records within a zone.
+        """List, and optionally filter, records within a zone.
 
         :param zone: the zone name in which to search.
-        :param int ttl: optionally, time in seconds:
-        :param data: optionally, the records data
-        :param host: optionally, record's host
-        :param record_type: optionally, the type of record:
+        :param int ttl: time in seconds
+        :param str data: the records data
+        :param str host: record's host
+        :param str record_type: the type of record
 
         :returns: A list of dictionaries representing the matching records
                   within the specified zone.
         """
-        _filter = NestedDict()
+        _filter = utils.NestedDict()
 
         if ttl:
-            _filter['resourceRecords']['ttl'] = query_filter(ttl)
+            _filter['resourceRecords']['ttl'] = utils.query_filter(ttl)
 
         if host:
-            _filter['resourceRecords']['host'] = query_filter(host)
+            _filter['resourceRecords']['host'] = utils.query_filter(host)
 
         if data:
-            _filter['resourceRecords']['data'] = query_filter(data)
+            _filter['resourceRecords']['data'] = utils.query_filter(data)
 
         if record_type:
-            _filter['resourceRecords']['type'] = query_filter(
+            _filter['resourceRecords']['type'] = utils.query_filter(
                 record_type.lower())
 
         results = self.service.getResourceRecords(
@@ -151,9 +152,10 @@ class DNSManager(IdentifierMixin, object):
         return results
 
     def edit_record(self, record):
-        """ Update an existing record with the options provided. The provided
-        dict must include an 'id' key and value corresponding to the record
-        that should be updated.
+        """Update an existing record with the options provided.
+
+        The provided dict must include an 'id' key and value corresponding to
+        the record that should be updated.
 
         :param dict record: the record to update
 
@@ -161,7 +163,7 @@ class DNSManager(IdentifierMixin, object):
         self.record.editObject(record, id=record['id'])
 
     def dump_zone(self, zone_id):
-        """ Retrieve a zone dump in BIND format.
+        """Retrieve a zone dump in BIND format.
 
         :param integer id: The zone ID to dump
 

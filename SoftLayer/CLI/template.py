@@ -8,39 +8,42 @@
     :license: MIT, see LICENSE for more details.
 """
 import os.path
-import ConfigParser
-import StringIO
 
-from exceptions import ArgumentError
+from SoftLayer import utils
 
 
-def update_with_template_args(args):
-    """ Populates arguments with arguments from the template file, if provided.
+class TemplateCallback(object):
+    """Callback to use to populate click arguments with a template."""
 
-    :param dict args: command-line arguments
-    """
-    if args.get('--template'):
-        template_path = args.pop('--template')
-        if not os.path.exists(template_path):
-            raise ArgumentError(
-                'File does not exist [-t | --template] = %s'
-                % template_path)
+    def __init__(self, list_args=None):
+        self.list_args = list_args or []
 
-        config = ConfigParser.ConfigParser()
+    def __call__(self, ctx, param, value):
+        if value is None:
+            return
+
+        config = utils.configparser.ConfigParser()
         ini_str = '[settings]\n' + open(
-            os.path.expanduser(template_path), 'r').read()
-        ini_fp = StringIO.StringIO(ini_str)
+            os.path.expanduser(value), 'r').read()
+        ini_fp = utils.StringIO(ini_str)
         config.readfp(ini_fp)
 
         # Merge template options with the options passed in
+        args = {}
         for key, value in config.items('settings'):
-            option_key = '--%s' % key
-            if not args.get(option_key):
-                args[option_key] = value
+            if key in self.list_args:
+                value = value.split(',')
+
+            if not args.get(key):
+                args[key] = value
+
+        if ctx.default_map is None:
+            ctx.default_map = {}
+        ctx.default_map.update(args)
 
 
 def export_to_template(filename, args, exclude=None):
-    """ Exports given options to the given filename in INI format
+    """Exports given options to the given filename in INI format.
 
     :param filename: Filename to save options to
     :param dict args: Arguments to export
@@ -48,15 +51,16 @@ def export_to_template(filename, args, exclude=None):
                                     be exported
     """
     exclude = exclude or []
-    exclude.append('--config')
-    exclude.append('--really')
-    exclude.append('--format')
-    exclude.append('--debug')
+    exclude.append('config')
+    exclude.append('really')
+    exclude.append('format')
+    exclude.append('debug')
 
-    with open(filename, "w") as f:
-        for k, v in args.items():
-            if v and k.startswith('-') and k not in exclude:
-                k = k.lstrip('-')
-                if isinstance(v, list):
-                    v = ','.join(v)
-                f.write('%s=%s\n' % (k, v))
+    with open(filename, "w") as template_file:
+        for k, val in args.items():
+            if val and k not in exclude:
+                if isinstance(val, tuple):
+                    val = ','.join(val)
+                if isinstance(val, list):
+                    val = ','.join(val)
+                template_file.write('%s=%s\n' % (k, val))

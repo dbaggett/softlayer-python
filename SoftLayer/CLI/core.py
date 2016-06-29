@@ -1,232 +1,193 @@
 """
-usage: sl <module> [<args>...]
-       sl help <module>
-       sl help <module> <command>
-       sl [-h | --help]
+    SoftLayer.CLI.core
+    ~~~~~~~~~~~~~~~~~~
+    Core for the SoftLayer CLI
 
-SoftLayer Command-line Client
-
-The available modules are:
-
-Compute:
-  bmc       Bare Metal Cloud
-  cci       Cloud Compute Instances
-  image     Manages compute and flex images
-  metadata  Get details about this machine. Also available with 'my' and 'meta'
-  server    Hardware servers
-  sshkey    Manage SSH keys on your account
-
-Networking:
-  dns        Domain Name System
-  firewall   Firewall rule and security management
-  globalip   Global IP address management
-  messaging  Message Queue Service
-  rwhois     RWhoIs operations
-  ssl        Manages SSL
-  subnet     Subnet ordering and management
-  vlan       Manage VLANs on your account
-
-Storage:
-  iscsi     View iSCSI details
-  nas       View NAS details
-
-General:
-  config    View and edit configuration for this tool
-  summary   Display an overall summary of your account
-  help      Show help
-
-See 'sl help <module>' for more information on a specific module.
-
-To use most commands your SoftLayer username and api_key need to be configured.
-The easiest way to do that is to use: 'sl config setup'
+    :license: MIT, see LICENSE for more details.
 """
-# :license: MIT, see LICENSE for more details.
-
-import sys
+from __future__ import print_function
 import logging
+import os
+import sys
+import time
+import types
 
-from docopt import docopt, DocoptExit
+import click
 
-from SoftLayer import Client, TimedClient, SoftLayerError, SoftLayerAPIError
-from SoftLayer.consts import VERSION
-from helpers import CLIAbort, ArgumentError, format_output, KeyValueTable
-from environment import Environment, InvalidCommand, InvalidModule
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer import consts
 
+# pylint: disable=too-many-public-methods, broad-except, unused-argument
+# pylint: disable=redefined-builtin, super-init-not-called
 
+START_TIME = time.time()
 DEBUG_LOGGING_MAP = {
-    '0': logging.CRITICAL,
-    '1': logging.WARNING,
-    '2': logging.INFO,
-    '3': logging.DEBUG
+    0: logging.CRITICAL,
+    1: logging.WARNING,
+    2: logging.INFO,
+    3: logging.DEBUG
 }
 
-VALID_FORMATS = ['raw', 'table', 'json']
+VALID_FORMATS = ['table', 'raw', 'json']
+DEFAULT_FORMAT = 'raw'
+if sys.stdout.isatty():
+    DEFAULT_FORMAT = 'table'
 
 
-class CommandParser(object):
-    def __init__(self, env):
-        self.env = env
+class CommandLoader(click.MultiCommand):
+    """Loads module for click."""
 
-    def get_main_help(self):
-        return __doc__.strip()
+    def __init__(self, *path, **attrs):
+        click.MultiCommand.__init__(self, **attrs)
+        self.path = path
 
-    def get_module_help(self, module_name):
-        module = self.env.load_module(module_name)
-        arg_doc = module.__doc__
-        return arg_doc.strip()
+    def list_commands(self, ctx):
+        """List all sub-commands."""
+        env = ctx.ensure_object(environment.Environment)
+        env.load()
 
-    def get_command_help(self, module_name, command_name):
-        command = self.env.get_command(module_name, command_name)
+        return sorted(env.list_commands(*self.path))
 
-        default_format = 'raw'
-        if sys.stdout.isatty():
-            default_format = 'table'
+    def get_command(self, ctx, name):
+        """Get command for click."""
+        env = ctx.ensure_object(environment.Environment)
+        env.load()
 
-        arg_doc = command.__doc__
+        # Do alias lookup (only available for root commands)
+        if len(self.path) == 0:
+            name = env.resolve_alias(name)
 
-        if 'confirm' in command.options:
-            arg_doc += """
-Prompt Options:
-  -y, --really  Confirm all prompt actions
-"""
-
-        if '[options]' in arg_doc:
-            arg_doc += """
-Standard Options:
-  --format=ARG           Output format. [Options: table, raw] [Default: %s]
-  -C FILE --config=FILE  Config file location. [Default: ~/.softlayer]
-  --debug=LEVEL          Specifies the debug noise level
-                           1=warn, 2=info, 3=debug
-  --timings              Time each API call and display after results
-  -h --help              Show this screen
-""" % default_format
-        return arg_doc.strip()
-
-    def parse_main_args(self, args):
-        main_help = self.get_main_help()
-        arguments = docopt(
-            main_help,
-            version=VERSION,
-            argv=args,
-            options_first=True)
-        arguments['<module>'] = self.env.get_module_name(arguments['<module>'])
-        return arguments
-
-    def parse_module_args(self, module_name, args):
-        arg_doc = self.get_module_help(module_name)
-        arguments = docopt(
-            arg_doc,
-            version=VERSION,
-            argv=[module_name] + args,
-            options_first=True)
-        return arguments
-
-    def parse_command_args(self, module_name, command_name, args):
-        command = self.env.get_command(module_name, command_name)
-        arg_doc = self.get_command_help(module_name, command_name)
-        arguments = docopt(arg_doc, version=VERSION, argv=[module_name] + args)
-        return command, arguments
-
-    def parse(self, args):
-        # handle `sl ...`
-        main_args = self.parse_main_args(args)
-        module_name = main_args['<module>']
-
-        # handle `sl <module> ...`
-        module_args = self.parse_module_args(module_name, main_args['<args>'])
-
-        # get the command argument
-        command_name = module_args.get('<command>')
-
-        # handle `sl <module> <command> ...`
-        return self.parse_command_args(
-            module_name,
-            command_name,
-            main_args['<args>'])
+        new_path = list(self.path)
+        new_path.append(name)
+        module = env.get_command(*new_path)
+        if isinstance(module, types.ModuleType):
+            return CommandLoader(*new_path, help=module.__doc__ or '')
+        else:
+            return module
 
 
-def main(args=sys.argv[1:], env=Environment()):
-    """
-    Entry point for the command-line client.
-    """
-    # Parse Top-Level Arguments
+@click.group(help="SoftLayer Command-line Client",
+             epilog="""To use most commands your SoftLayer
+username and api_key need to be configured. The easiest way to do that is to
+use: 'slcli setup'""",
+             cls=CommandLoader,
+             context_settings={'help_option_names': ['-h', '--help'],
+                               'auto_envvar_prefix': 'SLCLI'})
+@click.option('--format',
+              default=DEFAULT_FORMAT,
+              show_default=True,
+              help="Output format",
+              type=click.Choice(VALID_FORMATS))
+@click.option('--config', '-C',
+              required=False,
+              default=click.get_app_dir('softlayer', force_posix=True),
+              show_default=True,
+              help="Config file location",
+              type=click.Path(resolve_path=True))
+@click.option('--verbose', '-v',
+              help="Sets the debug noise level, specify multiple times "
+                   "for more verbosity.",
+              type=click.IntRange(0, 3, clamp=True),
+              count=True)
+@click.option('--proxy',
+              required=False,
+              help="HTTP[S] proxy to be use to make API calls")
+@click.option('--really / --not-really', '-y',
+              is_flag=True,
+              required=False,
+              help="Confirm all prompt actions")
+@click.option('--demo / --no-demo',
+              is_flag=True,
+              required=False,
+              help="Use demo data instead of actually making API calls")
+@click.version_option(prog_name="slcli (SoftLayer Command-line)")
+@environment.pass_env
+def cli(env,
+        format='table',
+        config=None,
+        verbose=0,
+        proxy=None,
+        really=False,
+        demo=False,
+        **kwargs):
+    """Main click CLI entry-point."""
+
+    if verbose > 0:
+        logger = logging.getLogger()
+        logger.addHandler(logging.StreamHandler())
+        logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
+
+    # Populate environement with client and set it as the context object
+    env.skip_confirmations = really
+    env.config_file = config
+    env.format = format
+    env.ensure_client(config_file=config, is_demo=demo, proxy=proxy)
+
+    env.vars['_start'] = time.time()
+    env.vars['_timings'] = SoftLayer.TimingTransport(env.client.transport)
+    env.client.transport = env.vars['_timings']
+
+
+@cli.resultcallback()
+@environment.pass_env
+def output_diagnostics(env, verbose=0, **kwargs):
+    """Output diagnostic information."""
+
+    if verbose > 0:
+        diagnostic_table = formatting.Table(['name', 'value'])
+        diagnostic_table.add_row(['execution_time',
+                                  '%fs' % (time.time() - START_TIME)])
+
+        api_call_value = []
+        for call, _, duration in env.vars['_timings'].get_last_calls():
+            api_call_value.append(
+                "%s::%s (%fs)" % (call.service, call.method, duration))
+
+        diagnostic_table.add_row(['api_calls', api_call_value])
+        diagnostic_table.add_row(['version', consts.USER_AGENT])
+        diagnostic_table.add_row(['python_version', sys.version])
+        diagnostic_table.add_row(['library_location',
+                                  os.path.dirname(SoftLayer.__file__)])
+
+        env.err(env.fmt(diagnostic_table))
+
+
+def main(reraise_exceptions=False, **kwargs):
+    """Main program. Catches several common errors and displays them nicely."""
     exit_status = 0
-    resolver = CommandParser(env)
+
     try:
-        command, command_args = resolver.parse(args)
-
-        # Set logging level
-        debug_level = command_args.get('--debug')
-        if debug_level:
-            logger = logging.getLogger()
-            h = logging.StreamHandler()
-            logger.addHandler(h)
-            logger.setLevel(DEBUG_LOGGING_MAP.get(debug_level, logging.DEBUG))
-
-        if command_args.get('--timings'):
-            client = TimedClient(config_file=command_args.get('--config'))
-        else:
-            client = Client(config_file=command_args.get('--config'))
-
-        # Do the thing
-        runnable = command(client=client, env=env)
-        data = runnable.execute(command_args)
-        if data:
-            out_format = command_args.get('--format', 'table')
-            if out_format not in VALID_FORMATS:
-                raise ArgumentError('Invalid format "%s"' % out_format)
-            s = format_output(data, fmt=out_format)
-            if s:
-                env.out(s)
-
-        if command_args.get('--timings'):
-            out_format = command_args.get('--format', 'table')
-            api_calls = client.get_last_calls()
-            t = KeyValueTable(['call', 'time'])
-
-            for call, _, duration in api_calls:
-                t.add_row([call, duration])
-
-            env.err(format_output(t, fmt=out_format))
-
-    except InvalidCommand as e:
-        env.err(resolver.get_module_help(e.module_name))
-        if e.command_name:
-            env.err('')
-            env.err(str(e))
+        cli.main(**kwargs)
+    except SoftLayer.SoftLayerAPIError as ex:
+        if 'invalid api token' in ex.faultString.lower():
+            print("Authentication Failed: To update your credentials,"
+                  " use 'slcli config setup'")
             exit_status = 1
-    except InvalidModule as e:
-        env.err(resolver.get_main_help())
-        if e.module_name:
-            env.err('')
-            env.err(str(e))
-        exit_status = 1
-    except DocoptExit as e:
-        env.err(e.usage)
-        env.err(
-            '\nUnknown argument(s), use -h or --help for available options')
-        exit_status = 127
-    except KeyboardInterrupt:
-        env.out('')
-        exit_status = 1
-    except CLIAbort as e:
-        env.err(str(e.message))
-        exit_status = e.code
-    except SystemExit as e:
-        exit_status = e.code
-    except SoftLayerAPIError as e:
-        if 'invalid api token' in e.faultString.lower():
-            env.out("Authentication Failed: To update your credentials, use "
-                    "'sl config setup'")
         else:
-            env.err(str(e))
+            print(str(ex))
             exit_status = 1
-    except SoftLayerError as e:
-        env.err(str(e))
+    except SoftLayer.SoftLayerError as ex:
+        print(str(ex))
         exit_status = 1
-    except Exception as e:
+    except exceptions.CLIAbort as ex:
+        print(str(ex.message))
+        exit_status = ex.code
+    except Exception:
+        if reraise_exceptions:
+            raise
+
         import traceback
-        env.err(traceback.format_exc())
+        print("An unexpected error has occured:")
+        print(str(traceback.format_exc()))
+        print("Feel free to report this error as it is likely a bug:")
+        print("    https://github.com/softlayer/softlayer-python/issues")
         exit_status = 1
 
     sys.exit(exit_status)
+
+
+if __name__ == '__main__':
+    main()
